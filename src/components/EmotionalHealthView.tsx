@@ -72,9 +72,9 @@ export default function EmotionalHealthView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Left/Middle: Logging Area */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="xl:col-span-2 space-y-6">
           <div className="bg-white p-6 md:p-8 rounded-[24px] shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-gray-100">
             <h3 className="font-display font-bold text-lg text-text-dark mb-4 flex items-center gap-2">
               <Smile className="w-5 h-5 text-pink-500" />

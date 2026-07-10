@@ -80,9 +80,9 @@ export default function WeeklyCheckInView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Left Form: Sliders & Selectors */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="xl:col-span-2 space-y-6">
           <div className="bg-white p-6 md:p-8 rounded-[24px] shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-gray-100 space-y-8">
             <h3 className="font-display font-bold text-lg text-text-dark pb-3 border-b border-gray-50 flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-indigo-500" />

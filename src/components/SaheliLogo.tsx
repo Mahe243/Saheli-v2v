@@ -320,62 +320,16 @@ export function SaheliLogoSVG({ className = "w-full max-w-[420px] h-auto" }: { c
  * Ideal for small interfaces, sidebars, dashboard headers, and floating profiles.
  * Intricately weaves three nested curves forming a continuous maternal line-art symbol.
  */
-export function SaheliAppIconSVG({ className = "w-10 h-10" }: { className?: string }) {
+interface SaheliAppIconProps {
+  className?: string;
+}
+
+export function SaheliAppIcon({ className = "w-10 h-10" }: SaheliAppIconProps) {
   return (
-    <svg
-      viewBox="0 0 100 100"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+    <img
+      src="data:image/png;base64,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"
+      alt="Saheli App Icon"
       className={`${className} transition-transform duration-300 hover:scale-105 filter drop-shadow-sm`}
-    >
-      <defs>
-        <linearGradient id="iconGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FFF2F1" />
-          <stop offset="100%" stopColor="#F5E5FF" />
-        </linearGradient>
-      </defs>
-      
-      <rect width="100" height="100" rx="26" fill="url(#iconGlow)" stroke="#F5D0D6" strokeWidth="1.5" />
-      
-      <g transform="translate(1, 1)">
-        {/* Outermost companion embrace curve */}
-        <path
-          d="M 30 45 C 30 25, 70 25, 70 45 C 70 65, 50 78, 50 78 C 50 78, 30 65, 30 45 Z"
-          stroke="#818CF8"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          opacity="0.25"
-        />
-
-        {/* Active healthcare/protection ring */}
-        <path
-          d="M 36 48 C 36 32, 64 32, 64 48 C 64 63, 50 73, 50 73 C 50 73, 36 63, 36 48 Z"
-          stroke="#E05B7C"
-          strokeWidth="4.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-
-        {/* Nurturing core/seedling */}
-        <path
-          d="M 43 51 C 43 41, 57 41, 57 51 C 57 60, 50 67, 50 67 C 50 67, 43 60, 43 51 Z"
-          stroke="#6366F1"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="#818CF8"
-          fillOpacity="0.35"
-        />
-
-        {/* Small sparkling golden star representing health excellence */}
-        <path
-          d="M 66 28 L 68 32 L 72 33 L 69 36 L 70 40 L 66 38 L 62 40 L 63 36 L 60 33 L 64 32 Z"
-          fill="#E89F3A"
-        />
-      </g>
-    </svg>
+    />
   );
 }

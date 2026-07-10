@@ -341,10 +341,10 @@ export default function SisterhoodView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         
         {/* Left column: Voice Cabin & Traditional Remedies */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="xl:col-span-2 space-y-8">
           
           {/* ASHA DIDI VOICE CABIN */}
           <div className="bg-white p-6 md:p-8 rounded-[24px] shadow-[0_10px_35px_rgba(0,0,0,0.015)] border border-gray-100 relative">
@@ -431,18 +431,18 @@ export default function SisterhoodView() {
 
               {/* Real-time Bilingual Transcript Subtitles */}
               <div className="flex-1 space-y-4">
-                <div className="bg-white/80 p-4 rounded-xl border border-gray-50 space-y-3">
+                <div className="bg-gradient-to-br from-amber-50 to-pink-50 p-5 rounded-xl border-2 border-pink-200 space-y-4 shadow-sm">
                   {/* Hindi transcript */}
-                  <div className="space-y-1">
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-orange-600 font-display">Hindi / हिंदी</span>
-                    <p className="text-sm font-medium text-text-dark leading-relaxed font-sans">
+                  <div className="space-y-1.5">
+                    <span className="text-xs font-black uppercase tracking-widest text-amber-800 font-display bg-amber-200/80 px-2.5 py-1 rounded-md inline-block">Hindi / हिंदी (Loud Subtitles)</span>
+                    <p className="text-lg md:text-xl font-extrabold text-orange-600 leading-relaxed font-sans drop-shadow-xs">
                       "{selectedAudio.hindiTranscript}"
                     </p>
                   </div>
                   {/* English transcript */}
-                  <div className="space-y-1 border-t border-gray-100/50 pt-3">
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-indigo-600 font-display">English Translation</span>
-                    <p className="text-xs font-medium text-text-muted leading-relaxed font-sans italic">
+                  <div className="space-y-1.5 border-t-2 border-dashed border-pink-200 pt-4">
+                    <span className="text-xs font-black uppercase tracking-widest text-fuchsia-800 font-display bg-fuchsia-100 px-2.5 py-1 rounded-md inline-block">English Translation</span>
+                    <p className="text-sm md:text-base font-extrabold text-indigo-700 leading-relaxed font-sans italic">
                       "{selectedAudio.englishTranscript}"
                     </p>
                   </div>
@@ -513,22 +513,22 @@ export default function SisterhoodView() {
               {TRADITIONAL_WISDOM.map((remedy) => (
                 <div 
                   key={remedy.id}
-                  className="p-5 bg-white border border-gray-100 rounded-[22px] hover:border-pink-200/60 hover:shadow-[0_8px_25px_rgba(0,0,0,0.015)] transition-all duration-300 flex items-start gap-4"
+                  className="p-5 bg-gradient-to-br from-white to-amber-50/30 border-2 border-orange-200/60 rounded-[22px] hover:border-orange-400 hover:shadow-md transition-all duration-300 flex items-start gap-4"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-orange-50/50 text-2xl flex items-center justify-center border border-orange-100/50 shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 text-2xl flex items-center justify-center text-white shadow-sm shrink-0">
                     {remedy.icon}
                   </div>
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold uppercase text-orange-600 tracking-wider bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100/30">
+                      <span className="text-xs font-black uppercase text-rose-700 tracking-wider bg-rose-100 px-2.5 py-1 rounded-full border border-rose-200/50">
                         {remedy.category}
                       </span>
                     </div>
-                    <h4 className="font-display font-bold text-sm text-text-dark mt-1">{remedy.title}</h4>
-                    <p className="text-xs text-text-muted leading-relaxed font-sans font-medium">{remedy.description}</p>
-                    <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-100 mt-2">
-                      <span className="text-[10px] uppercase font-bold text-indigo-600 block">How to use:</span>
-                      <p className="text-[11px] text-text-dark mt-0.5 leading-snug font-sans">{remedy.instruction}</p>
+                    <h4 className="font-display font-black text-sm text-amber-900 mt-1">{remedy.title}</h4>
+                    <p className="text-xs text-indigo-900 font-semibold leading-relaxed font-sans">{remedy.description}</p>
+                    <div className="bg-amber-100/70 p-3 rounded-xl border border-amber-200 mt-2">
+                      <span className="text-xs uppercase font-extrabold text-orange-700 block">How to use:</span>
+                      <p className="text-xs text-amber-950 mt-1 leading-snug font-bold font-sans">{remedy.instruction}</p>
                     </div>
                   </div>
                 </div>
@@ -542,7 +542,7 @@ export default function SisterhoodView() {
         <div className="space-y-8">
           
           {/* SISTER SUPPORT NOTE FORUM */}
-          <div className="bg-white p-6 rounded-[24px] shadow-[0_10px_35px_rgba(0,0,0,0.015)] border border-gray-100 flex flex-col h-full">
+          <div className="bg-white p-6 rounded-[24px] shadow-[0_10px_35px_rgba(0,0,0,0.015)] border border-gray-100 flex flex-col">
             <h3 className="font-display font-bold text-lg text-text-dark flex items-center gap-2.5 mb-2">
               <div className="p-2 bg-pink-50 rounded-lg text-pink-500 border border-pink-100/50">
                 <Users className="w-4.5 h-4.5 text-pink-500" />
@@ -600,21 +600,21 @@ export default function SisterhoodView() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
-                      className="p-4 border border-gray-100 hover:border-pink-100 rounded-xl bg-white space-y-3 hover:shadow-xs transition-all duration-300"
+                      className="p-4 border-2 border-pink-100 hover:border-pink-300 rounded-2xl bg-pink-50/15 space-y-3 hover:shadow-sm transition-all duration-300"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-pink-50 border border-pink-100 flex items-center justify-center text-base">
+                          <div className="w-9 h-9 rounded-full bg-pink-100 border-2 border-pink-300 flex items-center justify-center text-lg shadow-xs">
                             {letter.avatar}
                           </div>
                           <div>
-                            <span className="text-xs font-display font-bold text-text-dark block">{letter.author}</span>
-                            <span className="text-[9px] text-text-muted font-mono block leading-none">{letter.stage} • {letter.location}</span>
+                            <span className="text-xs font-display font-black text-slate-900 block">{letter.author}</span>
+                            <span className="text-[10px] text-indigo-700 font-mono font-bold block leading-none">{letter.stage} • {letter.location}</span>
                           </div>
                         </div>
                       </div>
 
-                      <p className="text-xs text-text-dark leading-relaxed font-sans font-medium italic">
+                      <p className="text-sm text-pink-800 font-bold leading-relaxed font-sans italic">
                         "{letter.content}"
                       </p>
 

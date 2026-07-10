@@ -26,7 +26,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import { SaheliLogoSVG, SaheliAppIconSVG } from "./SaheliLogo";
+import { SaheliLogoSVG } from "./SaheliLogo";
 import { orchestrator } from "../services/orchestrator";
 
 interface WelcomeScreenProps {
@@ -291,7 +291,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
 
               <div className="space-y-4 max-w-3xl">
                 <h1 className="text-3xl md:text-5xl font-display font-bold tracking-tight text-text-dark leading-tight">
-                  Healthcare designed to companion you, <span className="text-pastel-text border-b-4 border-pastel-blue">every single day.</span>
+                  Healthcare designed to accompany you, <span className="text-pastel-text border-b-4 border-pastel-blue">every single day.</span>
                 </h1>
                 <p className="text-base md:text-lg text-text-muted max-w-2xl mx-auto leading-relaxed font-sans">
                   Your health journey doesn't begin at the clinic, and it shouldn't end there. 

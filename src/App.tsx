@@ -26,7 +26,7 @@ import {
   Bookmark
 } from "lucide-react";
 
-import { SaheliAppIconSVG } from "./components/SaheliLogo";
+import { SaheliAppIcon } from "./components/SaheliLogo";
 import WelcomeScreen from "./components/WelcomeScreen";
 import DashboardView from "./components/DashboardView";
 import HealthBrainView from "./components/HealthBrainView";
@@ -162,7 +162,7 @@ export default function App() {
         {/* Brand / Logo - Logo in top left with Name and Tagline beside it */}
         <div className="py-5 px-6 border-b border-gray-100 flex flex-col justify-center">
           <div className="flex items-center gap-3">
-            <SaheliAppIconSVG className="w-10 h-10 flex-shrink-0" />
+            <SaheliAppIcon className="w-10 h-10 flex-shrink-0" />
             <div className="flex flex-col min-w-0">
               <span className="font-display font-black text-xl text-text-dark leading-none tracking-wide">Saheli</span>
               <span className="text-[10px] text-pink-600 font-bold leading-tight mt-1 whitespace-nowrap">आपकी और आपके अपनों की</span>
@@ -230,7 +230,7 @@ export default function App() {
             >
               <div className="py-5 px-5 flex items-center justify-between border-b border-gray-100">
                 <div className="flex items-center gap-2.5">
-                  <SaheliAppIconSVG className="w-9 h-9 flex-shrink-0" />
+                  <SaheliAppIcon className="w-9 h-9 flex-shrink-0" />
                   <div className="flex flex-col min-w-0">
                     <span className="font-display font-black text-lg text-text-dark leading-none tracking-wide">Saheli</span>
                     <span className="text-[9px] text-pink-600 font-bold leading-tight mt-0.5 whitespace-nowrap">आपकी और आपके अपनों की</span>
@@ -297,7 +297,7 @@ export default function App() {
 
             {/* Mobile-only brand identifier (Logo + Name + Tagline on the top-left for mobile) */}
             <div className="flex items-center gap-2.5 lg:hidden">
-              <SaheliAppIconSVG className="w-8 h-8 flex-shrink-0" />
+              <SaheliAppIcon className="w-8 h-8 flex-shrink-0" />
               <div className="flex flex-col">
                 <span className="font-display font-black text-sm text-text-dark leading-none">Saheli</span>
                 <span className="text-[8px] text-pink-600 font-bold leading-tight mt-0.5 whitespace-nowrap">आपकी और आपके अपनों की</span>
