@@ -7,7 +7,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import dotenv from "dotenv";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 
 dotenv.config();
@@ -37,6 +37,25 @@ if (API_KEY && API_KEY !== "MY_GEMINI_API_KEY") {
   }
 } else {
   console.log("No valid GEMINI_API_KEY found in environment. Using smart simulated fallback engine.");
+}
+
+// Robust helper to parse JSON response from Gemini, handling markdown block wrappers if present
+function safeParseJSON(text: string | undefined): any {
+  if (!text) return {};
+  let cleaned = text.trim();
+  if (cleaned.startsWith("```")) {
+    cleaned = cleaned.replace(/^```[a-zA-Z]*\n?/, "").replace(/\n?```$/, "").trim();
+  }
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    console.error("safeParseJSON: standard parsing failed, attempting cleanup of backslashes or internal quotes:", e);
+    try {
+      return JSON.parse(cleaned.replace(/,\s*([\]}])/g, "$1"));
+    } catch (innerError) {
+      throw e;
+    }
+  }
 }
 
 // Serve saheli image dynamically from the workspace root, assets, or src directory
@@ -170,10 +189,38 @@ app.post("/api/gemini/interview", async (req, res) => {
           contents: prompt,
           config: {
             responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                chiefComplaint: {
+                  type: Type.STRING,
+                  description: "A single short sentence stating the primary reason for seeking care."
+                },
+                symptoms: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                  description: "An array of specific symptoms mentioned (e.g., ['lower back ache', 'fatigue'])."
+                },
+                timeline: {
+                  type: Type.STRING,
+                  description: "A brief chronological description of when it started and how it progressed."
+                },
+                questionsForDoctor: {
+                  type: Type.ARRAY,
+                  items: { type: Type.STRING },
+                  description: "An array of 3 highly helpful, respectful questions the patient can ask her doctor during her visit."
+                },
+                severity: {
+                  type: Type.STRING,
+                  description: "Must be one of 'Mild', 'Moderate', or 'Severe'."
+                }
+              },
+              required: ["chiefComplaint", "symptoms", "timeline", "questionsForDoctor", "severity"]
+            }
           }
         });
 
-        const parsedResult = JSON.parse(response.text || "{}");
+        const parsedResult = safeParseJSON(response.text);
         return res.json({ summary: parsedResult });
       } catch (error) {
         console.error("Gemini summary generation failed, falling back to heuristic:", error);
@@ -240,10 +287,25 @@ app.post("/api/gemini/interview", async (req, res) => {
         contents: prompt,
         config: {
           responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              questionText: {
+                type: Type.STRING,
+                description: "The warm, comfortingly rephrased question."
+              },
+              suggestions: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "An array of 3 or 4 simple, highly common single-word or short-phrase response options matching the context (for easy clicking)."
+              }
+            },
+            required: ["questionText", "suggestions"]
+          }
         }
       });
 
-      const parsed = JSON.parse(response.text || "{}");
+      const parsed = safeParseJSON(response.text);
       return res.json({
         id: nextQuestionConfig.id,
         text: parsed.questionText || nextQuestionConfig.text,

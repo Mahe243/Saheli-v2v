@@ -34,6 +34,8 @@ export interface FamilyHistory {
   mother: string;
   father: string;
   grandparents: string;
+  siblings?: string;
+  conditions?: string[]; // e.g., ["Diabetes", "Hypertension", "Breast Cancer", "Ovarian Cancer", "Thyroid Disorders", "Heart Disease"]
 }
 
 export interface HealthBrain {
@@ -111,7 +113,13 @@ export type OrchestratorEventType =
   | "journal_entry_added"
   | "life_stage_updated"
   | "weekly_checkin_completed"
-  | "milestone_achieved";
+  | "milestone_achieved"
+  | "health_insights_generated"
+  | "knowledge_recommended"
+  | "monthly_review_created"
+  | "memory_updated"
+  | "indicator_updated"
+  | "search_index_updated";
 
 export interface OrchestratorEvent {
   type: OrchestratorEventType;
@@ -272,6 +280,85 @@ export interface Achievement {
   date: string;
   icon: string; // Emoji
   description: string;
+}
+
+// PHASE 4 DATA MODELS
+
+export interface HealthInsight {
+  id: string;
+  month: string; // e.g., "July 2026"
+  createdAt: string;
+  sleepTrend: string;
+  medicationAdherence: string;
+  energyTrend: string;
+  moodTrend: string;
+  cycleObservation: string;
+  lifestyleSummary: string;
+  followUpStatus: string;
+  generalTrends: string[];
+}
+
+export interface KnowledgeArticle {
+  id: string;
+  title: string;
+  category: string;
+  overview: string;
+  commonSymptoms: string[];
+  lifestyleTips: string[];
+  questionsToAskDoctor: string[];
+  trustedResources: string[];
+}
+
+export interface Recommendation {
+  id: string;
+  articleId: string;
+  triggerReason: string; // e.g., "Recommended based on family history of Diabetes"
+  recommendedAt: string;
+}
+
+export interface MonthlyReview {
+  id: string;
+  month: string; // e.g., "July 2026"
+  createdAt: string;
+  achievements: string[];
+  healthTrends: string[];
+  appointments: string[];
+  reportsUploadedCount: number;
+  symptomsLoggedCount: number;
+  medicationAdherenceRate: number; // percentage (0-100)
+  goalsCompletedCount: number;
+  lifestyleImprovements: string[];
+  questionsToDiscuss: string[];
+}
+
+export interface HealthIndicator {
+  id: string;
+  name: "Medication Adherence" | "Appointment Completion" | "Preventive Care Completion" | "Lifestyle Goals" | "Hydration" | "Sleep" | "Physical Activity" | "Symptom Tracking";
+  score: number; // 0 to 100
+  trend: "improving" | "stable" | "declining";
+  statusDescription: string; // Descriptive and actionable description (no "healthy", "excellent", "poor" labels)
+  weeklyTrendData: { date: string; value: number }[];
+  monthlyTrendData: { month: string; value: number }[];
+}
+
+export interface MemoryItem {
+  id: string;
+  category: "appointment" | "language" | "medication" | "doctor" | "fear_anxiety" | "exercise" | "goal" | "life_event" | "other";
+  key: string; // e.g., "Preferred appointment time"
+  value: string; // e.g., "Morning slots"
+  transparentReason: string; // e.g., "Shared during pregnancy setup"
+  updatedAt: string;
+}
+
+export interface SearchIndex {
+  id: string;
+  itemId: string;
+  itemType: "Timeline" | "Medical Record" | "Doctor Visit" | "Journal" | "Medication" | "Goal" | "Appointment" | "Symptom";
+  title: string;
+  description: string;
+  contentToSearch: string; // Lowercase searchable representation
+  date: string;
+  metadata?: any;
 }
 
 

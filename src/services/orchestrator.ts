@@ -25,7 +25,15 @@ import {
   WeeklyCheckIn,
   JournalEntry,
   HealthGoal,
-  Achievement
+  Achievement,
+  HealthInsight,
+  KnowledgeArticle,
+  Recommendation,
+  MonthlyReview,
+  HealthIndicator,
+  MemoryItem,
+  SearchIndex,
+  FamilyHistory
 } from "../types";
 
 // Seeding standard, culturally respectful mock data for Priya
@@ -387,6 +395,201 @@ const INITIAL_ACHIEVEMENTS: Achievement[] = [
   }
 ];
 
+const SEED_KNOWLEDGE_ARTICLES: KnowledgeArticle[] = [
+  {
+    id: "ka_1",
+    title: "Understanding PCOS (Polycystic Ovary Syndrome)",
+    category: "Reproductive Health",
+    overview: "PCOS is a common hormonal condition affecting women of reproductive age. It involves a slight imbalance in hormones which can affect how your ovaries work.",
+    commonSymptoms: [
+      "Irregular, delayed, or missed menstrual cycles",
+      "Persistent acne or skin changes",
+      "Thinning hair or excess body hair growth",
+      "Difficulty managing weight"
+    ],
+    lifestyleTips: [
+      "Keep a regular schedule for nutritious meals to support metabolic balance.",
+      "Engage in 20-30 minutes of moderate activity, like a steady walk through the fields or stretching.",
+      "Incorporate fiber-rich foods like whole grains, pulses, and local green leafy vegetables."
+    ],
+    questionsToAskDoctor: [
+      "Are my irregular periods related to my hormone levels?",
+      "Would a simple blood test or pelvic scan help explain my symptoms?",
+      "What gentle dietary adjustments do you recommend for my metabolic health?"
+    ],
+    trustedResources: [
+      "World Health Organization (WHO) Reproductive Health Guides",
+      "National Health Portal of India (NHP)",
+      "Local Accredited Social Health Activist (ASHA) guidelines"
+    ]
+  },
+  {
+    id: "ka_2",
+    title: "Preventing Iron Deficiency Anemia",
+    category: "Nutrition",
+    overview: "Anemia occurs when your blood has a lower amount of hemoglobin, a protein that carries oxygen to your muscles and brain. It is very common in women, especially postpartum or during heavy cycles.",
+    commonSymptoms: [
+      "Feeling unusually tired, weak, or short of breath",
+      "Pale skin, cold hands, and cold feet",
+      "Mild dizziness, especially when standing up quickly",
+      "Unexplained headaches or low stamina during daily chores"
+    ],
+    lifestyleTips: [
+      "Take your prescribed Iron and Folic Acid supplements daily with dinner to maximize absorption.",
+      "Eat iron-rich foods like spinach (palak), fenugreek (methi), lentils, and jaggery (gur) instead of white sugar.",
+      "Add Vitamin C (like lemons, amla, or oranges) to your meals to help your body absorb iron better.",
+      "Avoid drinking tea or coffee immediately after meals, as they can block iron absorption."
+    ],
+    questionsToAskDoctor: [
+      "What is my current Hemoglobin level, and what is our target?",
+      "How long should I continue taking daily iron and folic acid supplements?",
+      "Can we check my iron stores (Ferritin) to ensure my recovery?"
+    ],
+    trustedResources: [
+      "Anemia Mukt Bharat (Anemia-Free India) Initiative Portal",
+      "Ministry of Health and Family Welfare (MoHFW) India",
+      "WHO Nutritional Anemia Guidelines"
+    ]
+  },
+  {
+    id: "ka_3",
+    title: "Essential Nutrition for a Healthy Pregnancy",
+    category: "Maternity",
+    overview: "A safe, healthy pregnancy relies on giving your body and your growing baby the right nutrients. It prepares you for a smooth delivery and supportive postpartum recovery.",
+    commonSymptoms: [
+      "Increased appetite and changing taste preferences",
+      "Mild nausea or morning sickness in early months",
+      "Slightly increased demand for rest and hydration"
+    ],
+    lifestyleTips: [
+      "Eat diverse meals with extra servings of pulses, curd, seasonal fruits, and dark green vegetables.",
+      "Take your prenatal Folic Acid and Iron-Calcium supplements regularly as advised by your local nurse or doctor.",
+      "Stay well-hydrated by drinking clean water, coconut water, or fresh buttermilk throughout the day.",
+      "Practice gentle, safe exercises like short, relaxed walks in the mornings."
+    ],
+    questionsToAskDoctor: [
+      "What supplements are essential for me at this stage of pregnancy?",
+      "How much weight gain is healthy and normal for my body type?",
+      "Are there specific local foods I should avoid during my pregnancy?"
+    ],
+    trustedResources: [
+      "Janani Suraksha Yojana (JSY) guidelines",
+      "UNICEF Maternal Nutrition Handbooks",
+      "WHO Antenatal Care Guidelines"
+    ]
+  },
+  {
+    id: "ka_4",
+    title: "Tracking and Understanding Your Menstrual Cycle",
+    category: "Reproductive Health",
+    overview: "A regular menstrual cycle is an excellent sign of overall hormone health. Tracking it helps you understand your body's monthly rhythms and plan your daily activities comfortably.",
+    commonSymptoms: [
+      "Mild abdominal cramping or lower back discomfort before or during bleeding",
+      "Slight changes in mood or energy levels a few days before your period starts",
+      "Temporary bloating or breast tenderness"
+    ],
+    lifestyleTips: [
+      "Keep a clean, small calendar or use Saheli to log when your bleeding starts and ends.",
+      "Practice clean menstrual hygiene: change cotton cloths or sanitary pads every 4-6 hours.",
+      "Use warm water compresses to relieve lower back discomfort or mild stomach cramps.",
+      "Maintain your normal physical activity, but take gentle rests when your body asks for it."
+    ],
+    questionsToAskDoctor: [
+      "Is my cycle length (usually between 21 and 35 days) considered normal?",
+      "How can I manage severe premenstrual cramping without heavy medication?",
+      "What should I do if my bleeding lasts longer than 7 days or is extremely heavy?"
+    ],
+    trustedResources: [
+      "National Health Portal Menstrual Hygiene Scheme",
+      "Ministry of Women and Child Development (MWCD) India",
+      "UNICEF Menstrual Health and Hygiene guidance"
+    ]
+  },
+  {
+    id: "ka_5",
+    title: "Caring for Your Breast Health",
+    category: "Preventive Care",
+    overview: "Breast health awareness is essential for women of all ages. Regular breast self-checks allow you to know what is normal for your body, helping you spot any changes early when they are easiest to address.",
+    commonSymptoms: [
+      "A new, unusual lump in the breast or underarm area",
+      "Changes in the size or shape of the breast",
+      "Redness, dimpling, or scaling of the breast skin",
+      "Unexplained pain or fluid discharge"
+    ],
+    lifestyleTips: [
+      "Do a simple breast self-examination once a month, about 3-5 days after your period ends.",
+      "Wear comfortable, well-fitting cotton support garments during daily chores and agricultural work.",
+      "Stay active with regular physical routines and enjoy a diet rich in fruits, vegetables, and whole grains."
+    ],
+    questionsToAskDoctor: [
+      "How exactly do I perform a correct monthly breast self-examination?",
+      "At my age, should I schedule a clinical breast exam or a mammogram?",
+      "Are there any specific breast cancer risk factors in my family history we should monitor?"
+    ],
+    trustedResources: [
+      "National Cancer Grid India Patient Education Portal",
+      "WHO Breast Cancer Initiative Guidelines",
+      "Tata Memorial Hospital Women's Cancer Awareness"
+    ]
+  },
+  {
+    id: "ka_6",
+    title: "Navigating Perimenopause and Menopause",
+    category: "Healthy Aging",
+    overview: "Menopause is the natural phase in a woman's life when her menstrual cycles stop permanently, usually between the ages of 45 and 55. Perimenopause is the transition period leading up to it.",
+    commonSymptoms: [
+      "Irregular periods that become lighter or heavier and eventually stop",
+      "Sudden feelings of heat (hot flashes) or night sweats",
+      "Sleep disturbances, mild mood swings, or temporary forgetfulness",
+      "Joint or bone aches due to lower estrogen levels"
+    ],
+    lifestyleTips: [
+      "Keep your body cool by wearing breathable, loose cotton clothing and staying in well-ventilated rooms.",
+      "Strengthen your bones by eating calcium-rich foods like milk, curd, ragi (finger millet), and sesame seeds.",
+      "Spend 10-15 minutes in gentle morning sunlight to maintain healthy Vitamin D levels.",
+      "Practice cooling breathing exercises (like Sheetali Pranayama) to calm sudden hot flashes."
+    ],
+    questionsToAskDoctor: [
+      "Are my irregular periods and hot flashes typical signs of menopause transition?",
+      "How can I check if my bones are strong enough, and should I take calcium supplements?",
+      "Are there safe, non-hormonal ways to manage severe night sweats or sleep issues?"
+    ],
+    trustedResources: [
+      "Indian Menopause Society (IMS) guidelines",
+      "National Institute on Aging (NIA) Menopause guides",
+      "WHO Menopause transition fact sheets"
+    ]
+  },
+  {
+    id: "ka_7",
+    title: "Simple Stress Management for Busy Women",
+    category: "Mental Wellness",
+    overview: "Balancing farm work, child-rearing, cooking, and household responsibilities can be highly demanding. Mental wellness is a key pillar of physical health.",
+    commonSymptoms: [
+      "Feeling constantly overwhelmed, irritable, or restless",
+      "Difficulty falling asleep or staying asleep",
+      "Tension headaches, neck stiffness, or rapid heartbeats",
+      "Low energy or lack of motivation for daily chores"
+    ],
+    lifestyleTips: [
+      "Take 5 minutes twice a day to sit quietly and practice deep, slow abdominal breathing.",
+      "Share your thoughts and worries with a trusted family member or your close friends (sahelis) in the village.",
+      "Establish a relaxing bedtime routine, avoiding mobile screens or active chores 30 minutes before sleep.",
+      "Take small water breaks during long hours working in the fields or kitchen."
+    ],
+    questionsToAskDoctor: [
+      "Can chronic stress cause my physical symptoms like headaches or digestive issues?",
+      "Are there local community support groups or counselors I can talk to?",
+      "What breathing or meditation exercises are clinically proven to help calm anxiety?"
+    ],
+    trustedResources: [
+      "National Institute of Mental Health and Neuro Sciences (NIMHANS) India",
+      "Kiran Mental Health Helpline (Government of India)",
+      "WHO Stress Management Handbooks"
+    ]
+  }
+];
+
 export class OrchestratorService {
   private subscribers: Map<OrchestratorEventType, Set<EventSubscriber>> = new Map();
   private allSubscribers: Set<EventSubscriber> = new Set();
@@ -413,6 +616,15 @@ export class OrchestratorService {
   private goals: HealthGoal[] = [];
   private achievements: Achievement[] = [];
 
+  // Phase 4 States
+  private healthInsights: HealthInsight[] = [];
+  private knowledgeArticles: KnowledgeArticle[] = [];
+  private recommendations: Recommendation[] = [];
+  private monthlyReviews: MonthlyReview[] = [];
+  private healthIndicators: HealthIndicator[] = [];
+  private memoryItems: MemoryItem[] = [];
+  private searchIndex: SearchIndex[] = [];
+
   constructor() {
     // Load from local storage if available, otherwise seed
     const savedBrain = localStorage.getItem("saheli_health_brain");
@@ -435,6 +647,13 @@ export class OrchestratorService {
     const savedJournalEntries = localStorage.getItem("saheli_journal_entries");
     const savedGoals = localStorage.getItem("saheli_goals");
     const savedAchievements = localStorage.getItem("saheli_achievements");
+
+    // Phase 4 Loaders
+    const savedInsights = localStorage.getItem("saheli_health_insights");
+    const savedRecommendations = localStorage.getItem("saheli_recommendations");
+    const savedReviews = localStorage.getItem("saheli_monthly_reviews");
+    const savedIndicators = localStorage.getItem("saheli_health_indicators");
+    const savedMemories = localStorage.getItem("saheli_memory_items");
 
     this.brain = savedBrain ? JSON.parse(savedBrain) : INITIAL_HEALTH_BRAIN;
     this.timeline = savedTimeline ? JSON.parse(savedTimeline) : INITIAL_TIMELINE;
@@ -459,6 +678,69 @@ export class OrchestratorService {
     this.journalEntries = savedJournalEntries ? JSON.parse(savedJournalEntries) : INITIAL_JOURNAL_ENTRIES;
     this.goals = savedGoals ? JSON.parse(savedGoals) : INITIAL_GOALS;
     this.achievements = savedAchievements ? JSON.parse(savedAchievements) : INITIAL_ACHIEVEMENTS;
+
+    // Phase 4 Initializers
+    this.knowledgeArticles = SEED_KNOWLEDGE_ARTICLES;
+    this.healthInsights = savedInsights ? JSON.parse(savedInsights) : [];
+    this.recommendations = savedRecommendations ? JSON.parse(savedRecommendations) : [];
+    this.monthlyReviews = savedReviews ? JSON.parse(savedReviews) : [];
+    this.healthIndicators = savedIndicators ? JSON.parse(savedIndicators) : [];
+    
+    this.memoryItems = savedMemories ? JSON.parse(savedMemories) : [
+      {
+        id: "m1",
+        category: "appointment",
+        key: "Preferred Appointment Time",
+        value: "Morning slots (10:00 AM to 12:00 PM)",
+        transparentReason: "Explicitly shared during your conversation on July 5",
+        updatedAt: "2026-07-05"
+      },
+      {
+        id: "m2",
+        category: "language",
+        key: "Preferred Language",
+        value: "Hindi (हिंदी)",
+        transparentReason: "Configured during account setup",
+        updatedAt: "2026-05-15"
+      },
+      {
+        id: "m3",
+        category: "medication",
+        key: "Medication Reminder Timing",
+        value: "At night, after dinner (9:00 PM)",
+        transparentReason: "Logged during medication setup",
+        updatedAt: "2026-06-02"
+      },
+      {
+        id: "m4",
+        category: "fear_anxiety",
+        key: "Doctor Preparation Note",
+        value: "Slight nervousness about clinics, prefers doctors who explain terms in simple Hindi",
+        transparentReason: "Shared in emotional health notes",
+        updatedAt: "2026-07-06"
+      },
+      {
+        id: "m5",
+        category: "exercise",
+        key: "Favorite Exercise",
+        value: "Walking through local fields and stretching during postpartum recovery",
+        transparentReason: "Extracted from lifestyle profile",
+        updatedAt: "2026-05-20"
+      }
+    ];
+
+    // Seed defaults if empty
+    if (this.healthIndicators.length === 0) {
+      this.recalculateIndicatorsInternal();
+    }
+    if (this.healthInsights.length === 0) {
+      this.generateHealthInsightsInternal();
+    }
+    if (this.monthlyReviews.length === 0) {
+      this.generateMonthlyReviewInternal();
+    }
+    this.refreshRecommendations();
+    this.rebuildSearchIndexInternal();
 
     // Auto-save setup
     this.subscribeAll((event) => {
@@ -486,6 +768,13 @@ export class OrchestratorService {
       localStorage.setItem("saheli_journal_entries", JSON.stringify(this.journalEntries));
       localStorage.setItem("saheli_goals", JSON.stringify(this.goals));
       localStorage.setItem("saheli_achievements", JSON.stringify(this.achievements));
+
+      // Phase 4 Savers
+      localStorage.setItem("saheli_health_insights", JSON.stringify(this.healthInsights));
+      localStorage.setItem("saheli_recommendations", JSON.stringify(this.recommendations));
+      localStorage.setItem("saheli_monthly_reviews", JSON.stringify(this.monthlyReviews));
+      localStorage.setItem("saheli_health_indicators", JSON.stringify(this.healthIndicators));
+      localStorage.setItem("saheli_memory_items", JSON.stringify(this.memoryItems));
     });
   }
 
@@ -1326,6 +1615,522 @@ export class OrchestratorService {
     };
 
     this.updateHealthSummary(newSummary);
+  }
+
+  // PHASE 4 COMPREHENSIVE CARE ACTIONS & CALCULATIONS
+
+  public getHealthInsights(): HealthInsight[] {
+    return this.healthInsights;
+  }
+
+  public getKnowledgeArticles(): KnowledgeArticle[] {
+    return this.knowledgeArticles;
+  }
+
+  public getRecommendations(): Recommendation[] {
+    return this.recommendations;
+  }
+
+  public getMonthlyReviews(): MonthlyReview[] {
+    return this.monthlyReviews;
+  }
+
+  public getHealthIndicators(): HealthIndicator[] {
+    return this.healthIndicators;
+  }
+
+  public getMemoryItems(): MemoryItem[] {
+    return this.memoryItems;
+  }
+
+  public getSearchIndex(): SearchIndex[] {
+    return this.searchIndex;
+  }
+
+  public updateFamilyHistory(mother: string, father: string, grandparents: string, siblings?: string, conditions?: string[]) {
+    this.brain.familyHistory = {
+      mother,
+      father,
+      grandparents,
+      siblings,
+      conditions
+    };
+    this.publish("profile_updated", this.brain);
+    this.refreshRecommendations();
+    this.rebuildSearchIndexInternal();
+    this.triggerSummaryRegeneration();
+  }
+
+  public addMemoryItem(category: MemoryItem["category"], key: string, value: string, transparentReason: string) {
+    const id = "m_" + Math.random().toString(36).substring(2, 9);
+    const newItem: MemoryItem = {
+      id,
+      category,
+      key,
+      value,
+      transparentReason,
+      updatedAt: new Date().toISOString().split("T")[0]
+    };
+    this.memoryItems.unshift(newItem);
+    this.publish("memory_updated", newItem);
+  }
+
+  public deleteMemoryItem(id: string) {
+    this.memoryItems = this.memoryItems.filter(m => m.id !== id);
+    this.publish("memory_updated", id);
+  }
+
+  public search(query: string): SearchIndex[] {
+    if (!query) return [];
+    const lowercaseQuery = query.toLowerCase().trim();
+    return this.searchIndex.filter(item => 
+      item.contentToSearch.includes(lowercaseQuery) ||
+      item.title.toLowerCase().includes(lowercaseQuery) ||
+      item.itemType.toLowerCase().includes(lowercaseQuery)
+    );
+  }
+
+  public recalculateIndicatorsInternal() {
+    // 1. Medication Adherence
+    const activeMeds = this.medications.filter(m => m.status === "Active");
+    const medScore = activeMeds.length > 0 ? 92 : 80;
+    const medDesc = activeMeds.length > 0 
+      ? `Taking your ${activeMeds.map(m => m.name.split(" ")[0]).join(" & ")} daily as advised. Keeping this routine protects your baseline iron levels.`
+      : "No active medications require tracking. Continue standard nutrition supplements if advised.";
+
+    // 2. Appointment Completion
+    const apptScore = 95;
+    const apptDesc = "Routine maternal visits are booked in advance. Next consultation with Dr. Mehta is scheduled on July 23.";
+
+    // 3. Preventive Care Completion
+    const pendingPrev = this.preventive.filter(p => p.status === "Pending");
+    const prevScore = pendingPrev.length > 3 ? 70 : 85;
+    const prevDesc = pendingPrev.length > 0
+      ? `You have ${pendingPrev.length} pending preventive checkups, including your next prenatal exam. Completing these supports pre-conception safety.`
+      : "All age-recommended screenings and immunizations are up to date.";
+
+    // 4. Lifestyle Goals
+    const completedGoals = this.goals.filter(g => g.completed);
+    const goalsScore = this.goals.length > 0 ? Math.round((completedGoals.length / this.goals.length) * 100) || 60 : 75;
+    const goalsDesc = completedGoals.length > 0
+      ? `Progressing on stretching and hydration. You have completed ${completedGoals.length} health goals recently.`
+      : "Actively working on stretching and hydration goals. Consistency in routine supports core strength.";
+
+    // 5. Hydration
+    const latestCheckin = this.weeklyCheckIns[0];
+    const hydrationScore = latestCheckin ? (latestCheckin.waterIntake >= 4 ? 90 : 75) : 80;
+    const hydrationDesc = hydrationScore >= 90
+      ? "Drinking 8-10 glasses of water daily. Staying hydrated supports kidney function and physical stamina in the fields."
+      : "Drinking 5-6 glasses. Aim to carry a filled water flask to the fields to increase your daily hydration.";
+
+    // 6. Sleep
+    const sleepScore = latestCheckin ? (latestCheckin.sleep >= 4 ? 85 : 65) : 80;
+    const sleepDesc = sleepScore >= 80
+      ? "Averaging 7 hours of rest daily. Regular sleep allows muscles to recover and reduces postpartum back tension."
+      : "Averaging less than 6 hours. Prioritize resting when your baby sleeps to support your physical recovery.";
+
+    // 7. Physical Activity
+    const activityScore = latestCheckin ? (latestCheckin.exercise >= 4 ? 90 : 70) : 85;
+    const activityDesc = activityScore >= 90
+      ? "Engaging in 20-30 minutes of gentle walking and stretching. This strengthens lower back and abdominal core muscles."
+      : "Consider adding short 10-minute walks through the fields to gently increase daily mobility.";
+
+    // 8. Symptom Tracking
+    const symptomScore = this.symptoms.length > 0 ? 100 : 90;
+    const symptomDesc = this.symptoms.length > 0
+      ? "Logging back pain triggers regularly. Consistent tracking helps your doctor monitor back recovery patterns."
+      : "Tracking minor symptoms. Keep logging any unusual changes to ensure simple, preventive guidance.";
+
+    this.healthIndicators = [
+      {
+        id: "hi_1",
+        name: "Medication Adherence",
+        score: medScore,
+        trend: "improving",
+        statusDescription: medDesc,
+        weeklyTrendData: [
+          { date: "Mon", value: medScore - 5 },
+          { date: "Tue", value: medScore },
+          { date: "Wed", value: medScore },
+          { date: "Thu", value: medScore - 2 },
+          { date: "Fri", value: medScore },
+          { date: "Sat", value: medScore },
+          { date: "Sun", value: medScore }
+        ],
+        monthlyTrendData: [
+          { month: "May", value: medScore - 10 },
+          { month: "Jun", value: medScore - 2 },
+          { month: "Jul", value: medScore }
+        ]
+      },
+      {
+        id: "hi_2",
+        name: "Appointment Completion",
+        score: apptScore,
+        trend: "stable",
+        statusDescription: apptDesc,
+        weeklyTrendData: [
+          { date: "Mon", value: apptScore },
+          { date: "Tue", value: apptScore },
+          { date: "Wed", value: apptScore },
+          { date: "Thu", value: apptScore },
+          { date: "Fri", value: apptScore },
+          { date: "Sat", value: apptScore },
+          { date: "Sun", value: apptScore }
+        ],
+        monthlyTrendData: [
+          { month: "May", value: 90 },
+          { month: "Jun", value: 95 },
+          { month: "Jul", value: apptScore }
+        ]
+      },
+      {
+        id: "hi_3",
+        name: "Preventive Care Completion",
+        score: prevScore,
+        trend: "improving",
+        statusDescription: prevDesc,
+        weeklyTrendData: [
+          { date: "Mon", value: prevScore - 5 },
+          { date: "Tue", value: prevScore - 5 },
+          { date: "Wed", value: prevScore },
+          { date: "Thu", value: prevScore },
+          { date: "Fri", value: prevScore },
+          { date: "Sat", value: prevScore },
+          { date: "Sun", value: prevScore }
+        ],
+        monthlyTrendData: [
+          { month: "May", value: 70 },
+          { month: "Jun", value: 80 },
+          { month: "Jul", value: prevScore }
+        ]
+      },
+      {
+        id: "hi_4",
+        name: "Lifestyle Goals",
+        score: goalsScore,
+        trend: "improving",
+        statusDescription: goalsDesc,
+        weeklyTrendData: [
+          { date: "Mon", value: goalsScore - 10 },
+          { date: "Tue", value: goalsScore - 5 },
+          { date: "Wed", value: goalsScore - 5 },
+          { date: "Thu", value: goalsScore },
+          { date: "Fri", value: goalsScore },
+          { date: "Sat", value: goalsScore },
+          { date: "Sun", value: goalsScore }
+        ],
+        monthlyTrendData: [
+          { month: "May", value: 50 },
+          { month: "Jun", value: 65 },
+          { month: "Jul", value: goalsScore }
+        ]
+      },
+      {
+        id: "hi_5",
+        name: "Hydration",
+        score: hydrationScore,
+        trend: "stable",
+        statusDescription: hydrationDesc,
+        weeklyTrendData: [
+          { date: "Mon", value: 80 },
+          { date: "Tue", value: 80 },
+          { date: "Wed", value: 90 },
+          { date: "Thu", value: 80 },
+          { date: "Fri", value: 90 },
+          { date: "Sat", value: 90 },
+          { date: "Sun", value: hydrationScore }
+        ],
+        monthlyTrendData: [
+          { month: "May", value: 75 },
+          { month: "Jun", value: 82 },
+          { month: "Jul", value: hydrationScore }
+        ]
+      },
+      {
+        id: "hi_6",
+        name: "Sleep",
+        score: sleepScore,
+        trend: "stable",
+        statusDescription: sleepDesc,
+        weeklyTrendData: [
+          { date: "Mon", value: 70 },
+          { date: "Tue", value: 80 },
+          { date: "Wed", value: 80 },
+          { date: "Thu", value: 70 },
+          { date: "Fri", value: sleepScore },
+          { date: "Sat", value: sleepScore },
+          { date: "Sun", value: sleepScore }
+        ],
+        monthlyTrendData: [
+          { month: "May", value: 80 },
+          { month: "Jun", value: 82 },
+          { month: "Jul", value: sleepScore }
+        ]
+      },
+      {
+        id: "hi_7",
+        name: "Physical Activity",
+        score: activityScore,
+        trend: "improving",
+        statusDescription: activityDesc,
+        weeklyTrendData: [
+          { date: "Mon", value: 70 },
+          { date: "Tue", value: 70 },
+          { date: "Wed", value: 80 },
+          { date: "Thu", value: 90 },
+          { date: "Fri", value: 90 },
+          { date: "Sat", value: activityScore },
+          { date: "Sun", value: activityScore }
+        ],
+        monthlyTrendData: [
+          { month: "May", value: 75 },
+          { month: "Jun", value: 80 },
+          { month: "Jul", value: activityScore }
+        ]
+      },
+      {
+        id: "hi_8",
+        name: "Symptom Tracking",
+        score: symptomScore,
+        trend: "improving",
+        statusDescription: symptomDesc,
+        weeklyTrendData: [
+          { date: "Mon", value: 90 },
+          { date: "Tue", value: 90 },
+          { date: "Wed", value: 100 },
+          { date: "Thu", value: 100 },
+          { date: "Fri", value: 100 },
+          { date: "Sat", value: 100 },
+          { date: "Sun", value: symptomScore }
+        ],
+        monthlyTrendData: [
+          { month: "May", value: 80 },
+          { month: "Jun", value: 90 },
+          { month: "Jul", value: symptomScore }
+        ]
+      }
+    ];
+
+    this.publish("indicator_updated", this.healthIndicators);
+  }
+
+  public generateHealthInsightsInternal() {
+    this.healthInsights = [
+      {
+        id: "insight_july_2026",
+        month: "July 2026",
+        createdAt: new Date().toISOString(),
+        sleepTrend: "Your sleep duration has stabilized at 7 hours, with slightly higher physical fatigue reported during weeks of increased agricultural activity.",
+        medicationAdherence: "Consistent 92% adherence rates for iron tablets. Keep taking them after dinner to minimize stomach sensitivity.",
+        energyTrend: "Overall energy has increased since starting your daily morning fields walking and pelvic stretching exercises.",
+        moodTrend: "Predominantly Calm and Happy. Mild worries relate occasionally to household planning, which resolves with social support.",
+        cycleObservation: "Postpartum cycle spacing is still irregular, which is typical. Your upcoming appointment will help provide tailored pre-conception guidance.",
+        lifestyleSummary: "Successfully integrated local iron-rich foods like spinach and organic jaggery, while meeting daily hydration targets.",
+        followUpStatus: "Consultation with Dr. Mehta scheduled on July 23 to review blood panels and discuss safe pre-conception routines.",
+        generalTrends: [
+          "Taking iron supplements alongside Vitamin C from lemons significantly boosts absorption and daily energy.",
+          "Gentle lower back stretching provides fast, observable relief from postpartum spinal discomfort.",
+          "Sharing child development tracking milestones with your local nurse Sunita builds excellent community support."
+        ]
+      }
+    ];
+    this.publish("health_insights_generated", this.healthInsights);
+  }
+
+  public generateMonthlyReviewInternal() {
+    this.monthlyReviews = [
+      {
+        id: "rev_july_2026",
+        month: "July 2026",
+        createdAt: new Date().toISOString(),
+        achievements: [
+          "Completed a 15-day streak of your morning back and core stretches.",
+          "Logged your weekly health vitals checklist every week without missing any data.",
+          "Successfully incorporated daily iron supplements into your standard bedtime routine."
+        ],
+        healthTrends: [
+          "Your hemoglobin scores are showing slow, gradual improvement towards target levels.",
+          "Postpartum back discomfort has reduced from moderate to mild severity with stretching.",
+          "Your overall physical endurance during field work has improved."
+        ],
+        appointments: [
+          "Upcoming pre-conception checkup with Dr. Anjali Mehta on July 23 at 10:00 AM."
+        ],
+        reportsUploadedCount: this.medicalRecords.length,
+        symptomsLoggedCount: this.symptoms.length,
+        medicationAdherenceRate: 92,
+        goalsCompletedCount: this.goals.filter(g => g.completed).length || 1,
+        lifestyleImprovements: [
+          "Replaced refined white sugar with local iron-rich jaggery in family tea.",
+          "Began carrying a dedicated water flask to the fields to increase hydration.",
+          "Addressed afternoon fatigue by taking five-minute deep-breathing breaks."
+        ],
+        questionsToDiscuss: [
+          "Is my current iron supplement dosage ideal for pre-conception planning?",
+          "Are my pelvic stretching exercises safe to continue once pregnancy is confirmed?",
+          "Should we schedule any updated blood panels before the next phase?"
+        ]
+      }
+    ];
+    this.publish("monthly_review_created", this.monthlyReviews);
+  }
+
+  public refreshRecommendations() {
+    this.recommendations = [];
+
+    // 1. Check Hemoglobin / Iron
+    const hasLowHb = this.medicalRecords.some(r => r.labReport?.metrics.some(m => m.name === "Hemoglobin" && m.status === "Low")) || 
+                     this.medications.some(m => m.name.toLowerCase().includes("iron"));
+    if (hasLowHb) {
+      this.recommendations.push({
+        id: "rec_ka_2",
+        articleId: "ka_2",
+        triggerReason: "Recommended based on your recent blood panel showing low Hemoglobin levels.",
+        recommendedAt: new Date().toISOString()
+      });
+    }
+
+    // 2. Family History conditions
+    const familyDb = this.brain.familyHistory?.grandparents?.toLowerCase().includes("diabetes") || false;
+    if (familyDb) {
+      this.recommendations.push({
+        id: "rec_ka_1",
+        articleId: "ka_1",
+        triggerReason: "Recommended based on maternal family history of diabetes and PCOS metabolic markers.",
+        recommendedAt: new Date().toISOString()
+      });
+    }
+
+    // 3. Pregnancy goal
+    const preconGoal = this.goals.some(g => g.title.toLowerCase().includes("pregnancy")) || 
+                       this.brain.healthGoals?.some(g => g.toLowerCase().includes("pregnancy")) ||
+                       this.currentLifeStage === "Trying to Conceive";
+    if (preconGoal) {
+      this.recommendations.push({
+        id: "rec_ka_3",
+        articleId: "ka_3",
+        triggerReason: "Recommended because you are actively planning a healthy pregnancy.",
+        recommendedAt: new Date().toISOString()
+      });
+    }
+
+    // 4. Default fallbacks
+    if (this.recommendations.length < 3) {
+      this.recommendations.push({
+        id: "rec_ka_7",
+        articleId: "ka_7",
+        triggerReason: "Recommended to support balanced stress management and mindfulness.",
+        recommendedAt: new Date().toISOString()
+      });
+    }
+    if (this.recommendations.length < 3) {
+      this.recommendations.push({
+        id: "rec_ka_4",
+        articleId: "ka_4",
+        triggerReason: "Recommended for tracking and understanding normal menstrual rhythm.",
+        recommendedAt: new Date().toISOString()
+      });
+    }
+
+    this.publish("knowledge_recommended", this.recommendations);
+  }
+
+  public rebuildSearchIndexInternal() {
+    this.searchIndex = [];
+
+    // Index Timeline events
+    this.timeline.forEach(item => {
+      this.searchIndex.push({
+        id: "idx_t_" + item.id,
+        itemId: item.id,
+        itemType: "Timeline",
+        title: item.title,
+        description: item.description,
+        contentToSearch: `${item.title} ${item.description} ${item.notes || ""}`.toLowerCase(),
+        date: item.date
+      });
+    });
+
+    // Index Medical Records
+    this.medicalRecords.forEach(item => {
+      this.searchIndex.push({
+        id: "idx_rec_" + item.id,
+        itemId: item.id,
+        itemType: "Medical Record",
+        title: item.title,
+        description: `Hospital: ${item.hospital || ""}. Doctor: ${item.doctor || ""}. Summary: ${item.previewText || ""}`,
+        contentToSearch: `${item.title} ${item.hospital || ""} ${item.doctor || ""} ${item.previewText || ""} ${item.labReport?.summaryExplanation || ""}`.toLowerCase(),
+        date: item.date
+      });
+    });
+
+    // Index Medications
+    this.medications.forEach(item => {
+      this.searchIndex.push({
+        id: "idx_med_" + item.id,
+        itemId: item.id,
+        itemType: "Medication",
+        title: item.name,
+        description: `Dose: ${item.dose}. Frequency: ${item.frequency}. Status: ${item.status}`,
+        contentToSearch: `${item.name} ${item.dose} ${item.frequency} ${item.duration} ${item.status}`.toLowerCase(),
+        date: item.startDate
+      });
+    });
+
+    // Index Appointments
+    this.appointments.forEach(item => {
+      this.searchIndex.push({
+        id: "idx_appt_" + item.id,
+        itemId: item.id,
+        itemType: "Appointment",
+        title: `Doctor Appointment with ${item.doctorName}`,
+        description: `Purpose: ${item.purpose} on ${item.date} at ${item.time}`,
+        contentToSearch: `${item.doctorName} ${item.purpose} ${item.time} ${item.date}`.toLowerCase(),
+        date: item.date
+      });
+    });
+
+    // Index Symptoms
+    this.symptoms.forEach(item => {
+      this.searchIndex.push({
+        id: "idx_sym_" + item.id,
+        itemId: item.id,
+        itemType: "Symptom",
+        title: `Logged Symptom: ${item.name}`,
+        description: `Severity: ${item.severity}. Notes: ${item.notes || "None"}`,
+        contentToSearch: `${item.name} ${item.severity} ${item.notes || ""}`.toLowerCase(),
+        date: item.date
+      });
+    });
+
+    // Index Journal Entries
+    this.journalEntries.forEach(item => {
+      this.searchIndex.push({
+        id: "idx_je_" + item.id,
+        itemId: item.id,
+        itemType: "Journal",
+        title: "Daily Journal Entry",
+        description: item.text.substring(0, 100),
+        contentToSearch: `${item.text}`.toLowerCase(),
+        date: item.date
+      });
+    });
+
+    // Index Goals
+    this.goals.forEach(item => {
+      this.searchIndex.push({
+        id: "idx_g_" + item.id,
+        itemId: item.id,
+        itemType: "Goal",
+        title: item.title,
+        description: `Target: ${item.targetValue} ${item.unit}. Progress: ${item.currentValue} ${item.unit}. Status: ${item.completed ? 'Completed' : 'Active'}`,
+        contentToSearch: `${item.title} ${item.category} ${item.unit}`.toLowerCase(),
+        date: new Date().toISOString().split("T")[0]
+      });
+    });
+
+    this.publish("search_index_updated", this.searchIndex);
   }
 
   public resetToDefault() {
