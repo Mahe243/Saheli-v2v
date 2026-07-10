@@ -23,12 +23,14 @@ import {
   FileText,
   Activity,
   Stethoscope,
-  Bookmark
+  Bookmark,
+  Droplet
 } from "lucide-react";
 
 import { SaheliAppIcon } from "./components/SaheliLogo";
 import WelcomeScreen from "./components/WelcomeScreen";
 import DashboardView from "./components/DashboardView";
+import WomensHealthView from "./components/WomensHealthView";
 import HealthBrainView from "./components/HealthBrainView";
 import ConversationView from "./components/ConversationView";
 import TimelineView from "./components/TimelineView";
@@ -40,8 +42,11 @@ import LabIntelligenceView from "./components/LabIntelligenceView";
 import DoctorCompanionView from "./components/DoctorCompanionView";
 import MedicationDashboardView from "./components/MedicationDashboardView";
 import PreventiveCareView from "./components/PreventiveCareView";
+import AppointmentModal from "./components/AppointmentModal";
+import AIGuideBot from "./components/AIGuideBot";
 import { orchestrator } from "./services/orchestrator";
 import { OrchestratorEvent } from "./types";
+import { useTranslation } from "./utils/translation";
 
 const tabBackgrounds: Record<string, string> = {
   "Dashboard": "bg-[#FFF5F6]", // Pastel Rose
@@ -53,11 +58,13 @@ const tabBackgrounds: Record<string, string> = {
   "Doctor Companion": "bg-[#EBFDF9]", // Pastel Teal
   "Medication Dashboard": "bg-[#FFF9DB]", // Pastel Buttercup
   "Preventive Care": "bg-[#FFF5F7]", // Pastel Coral
+  "Women's Health Tracking": "bg-[#FFF0F6]", // Pastel Blossom Pink
   "Orchestrator Logs": "bg-[#F1F3F5]", // Pastel Slate Grey
   "Settings": "bg-[#F8F9FA]" // Pastel Neutral
 };
 
 export default function App() {
+  const { t } = useTranslation();
   // Navigation states
   const [isOnboarded, setIsOnboarded] = useState(() => {
     return localStorage.getItem("saheli_onboarded") === "true";
@@ -65,6 +72,16 @@ export default function App() {
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isSymptomModalOpen, setIsSymptomModalOpen] = useState(false);
+  const [isApptModalOpen, setIsApptModalOpen] = useState(false);
+
+  const handleGuideRedirect = (tab: string, action: string | null) => {
+    setActiveTab(tab);
+    if (action === "open_symptoms_modal") {
+      setIsSymptomModalOpen(true);
+    } else if (action === "open_appointment_modal") {
+      setIsApptModalOpen(true);
+    }
+  };
 
   // Reactive user profile state
   const [userProfile, setUserProfile] = useState(() => orchestrator.getHealthBrain().profile);
@@ -150,6 +167,7 @@ export default function App() {
     { name: "Doctor Companion", icon: Stethoscope },
     { name: "Medication Dashboard", icon: Bookmark },
     { name: "Preventive Care", icon: Heart },
+    { name: "Women's Health Tracking", icon: Droplet },
     { name: "Orchestrator Logs", icon: Cpu },
     { name: "Settings", icon: SettingsIcon },
   ];
@@ -188,7 +206,7 @@ export default function App() {
                 }`}
               >
                 <Icon className={`w-4.5 h-4.5 ${isActive ? "text-text-dark" : "text-text-muted"}`} />
-                {item.name}
+                {t(item.name)}
               </motion.button>
             );
           })}
@@ -258,7 +276,7 @@ export default function App() {
                       }`}
                     >
                       <Icon className="w-4.5 h-4.5" />
-                      {item.name}
+                      {t(item.name)}
                     </motion.button>
                   );
                 })}
@@ -409,6 +427,7 @@ export default function App() {
               {activeTab === "Doctor Companion" && <DoctorCompanionView />}
               {activeTab === "Medication Dashboard" && <MedicationDashboardView />}
               {activeTab === "Preventive Care" && <PreventiveCareView />}
+              {activeTab === "Women's Health Tracking" && <WomensHealthView />}
               {activeTab === "Orchestrator Logs" && <OrchestratorLogs />}
               {activeTab === "Settings" && <SettingsView />}
             </motion.div>
@@ -422,6 +441,15 @@ export default function App() {
         isOpen={isSymptomModalOpen} 
         onClose={() => setIsSymptomModalOpen(false)} 
       />
+
+      {/* Global Appointment booking Modal */}
+      <AppointmentModal 
+        isOpen={isApptModalOpen} 
+        onClose={() => setIsApptModalOpen(false)} 
+      />
+
+      {/* AI Feature Locator / Guide Bot */}
+      <AIGuideBot onRedirect={handleGuideRedirect} />
 
     </div>
   );

@@ -11,7 +11,6 @@ import {
   X, 
   AlertTriangle, 
   Activity, 
-  Plus, 
   Clock, 
   CheckCircle, 
   Percent,
@@ -22,19 +21,12 @@ import {
 } from "lucide-react";
 import { orchestrator } from "../services/orchestrator";
 import { Medication, MedicationCheckIn } from "../types";
+import { useTranslation } from "../utils/translation";
 
 export default function MedicationDashboardView() {
+  const { t } = useTranslation();
   const [medications, setMedications] = useState<Medication[]>([]);
   const [todayDate] = useState(new Date().toISOString().split("T")[0]);
-  
-  // State for adding a new medicine
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [medName, setMedName] = useState("");
-  const [medDose, setMedDose] = useState("");
-  const [medFreq, setMedFreq] = useState("Once daily");
-  const [medDuration, setMedDuration] = useState("5 days");
-  const [startDate, setStartDate] = useState(todayDate);
-  const [endDate, setEndDate] = useState(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]);
 
   // Check-in helper state
   const [sideEffectMap, setSideEffectMap] = useState<Record<string, string>>({});
@@ -93,29 +85,6 @@ export default function MedicationDashboardView() {
     setMedications([...orchestrator.getMedications()]);
   };
 
-  const handleAddMedicationSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!medName || !medDose) return;
-
-    orchestrator.addMedication({
-      name: medName,
-      dose: medDose,
-      frequency: medFreq,
-      duration: medDuration,
-      startDate,
-      endDate,
-      status: "Active"
-    });
-
-    setMedName("");
-    setMedDose("");
-    setMedFreq("Once daily");
-    setMedDuration("5 days");
-    setStartDate(todayDate);
-    setEndDate(new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]);
-    setShowAddForm(false);
-  };
-
   return (
     <div id="medication-dashboard" className="space-y-8 max-w-6xl mx-auto p-1 animate-fade-in">
       
@@ -125,143 +94,33 @@ export default function MedicationDashboardView() {
           <div>
             <h1 className="text-3xl font-display font-bold text-text-dark tracking-tight leading-tight flex items-center gap-2.5">
               <Bookmark className="w-8 h-8 text-[#E05B7C]" />
-              Medication Dashboard
+              {t("Medication Dashboard")}
             </h1>
             <p className="text-text-muted mt-1 text-sm font-sans">
-              Track daily adherence compliance, monitor therapeutic cycles, and report side effects safely.
+              {t("Track daily adherence compliance, monitor therapeutic cycles, and report side effects safely.")}
             </p>
           </div>
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-[#D8C4F1] text-white font-display font-bold rounded-full shadow-[0_4px_15px_rgba(79,70,229,0.15)] hover:scale-102 active:scale-98 transition-all cursor-pointer border border-purple-200/50"
-          >
-            <Plus className="w-5 h-5" />
-            <span>Add Medication</span>
-          </button>
+          
+          <div className="flex items-center gap-2.5 p-3.5 bg-indigo-50/50 rounded-2xl border border-indigo-100/50 max-w-md">
+            <Info className="w-5 h-5 text-indigo-500 shrink-0" />
+            <p className="text-xs text-indigo-800 font-sans leading-relaxed">
+              {t("To protect clinical safety, medications are prescribed and added by your doctor during consultations. You can prepare and sync them in Doctor Companion.")}
+            </p>
+          </div>
         </div>
 
         {/* Safety Warning Disclaimer Box */}
         <div className="bg-rose-50 border border-rose-200/80 p-4 rounded-2xl flex items-start gap-3.5 shadow-sm">
           <AlertTriangle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
           <div className="text-xs font-sans text-rose-800 space-y-1">
-            <span className="font-bold block text-rose-950 uppercase tracking-wide">Critical Medication Safety Policy</span>
+            <span className="font-bold block text-rose-950 uppercase tracking-wide">{t("Critical Medication Safety Policy")}</span>
             <p className="leading-relaxed">
-              <strong>Never recommend stopping medications, changing doses, or skipping schedules without explicit physician authorization.</strong> 
-              If you experience side effects, please consult Dr. Anjali Mehta immediately. This dashboard is strictly for personal reminders and adherence monitoring.
+              <strong>{t("Never recommend stopping medications, changing doses, or skipping schedules without explicit physician authorization.")}</strong> 
+              {t("If you experience side effects, please consult Dr. Anjali Mehta immediately. This dashboard is strictly for personal reminders and adherence monitoring.")}
             </p>
           </div>
         </div>
       </div>
-
-      {/* 2. Add Medication Form Expansion */}
-      {showAddForm && (
-        <div className="bg-white p-6 md:p-8 rounded-[24px] shadow-[0_10px_35px_rgba(0,0,0,0.015)] border border-pink-100 relative overflow-hidden animate-scale-in">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-pink-50 to-transparent rounded-bl-full"></div>
-          <h3 className="font-display font-bold text-lg text-text-dark mb-4 flex items-center gap-2">
-            <Bookmark className="w-5 h-5 text-indigo-600" />
-            Schedule New Medication
-          </h3>
-
-          <form onSubmit={handleAddMedicationSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5 font-sans">Medicine Name *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Iron & Folic Acid, Calcium Lactate"
-                  value={medName}
-                  onChange={(e) => setMedName(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 font-sans text-sm text-text-dark"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5 font-sans">Dosage *</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 500mg, 1 tablet"
-                    value={medDose}
-                    onChange={(e) => setMedDose(e.target.value)}
-                    required
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 font-sans text-sm text-text-dark"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5 font-sans">Frequency *</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Once daily, Before Bed"
-                    value={medFreq}
-                    onChange={(e) => setMedFreq(e.target.value)}
-                    required
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 font-sans text-sm text-text-dark"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5 font-sans">Start Date</label>
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    required
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 font-sans text-sm text-text-dark"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5 font-sans">End Date / Duration</label>
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    required
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 font-sans text-sm text-text-dark"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-between">
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5 font-sans">Medication Duration</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 5 days, 3 months, Chronic"
-                    value={medDuration}
-                    onChange={(e) => setMedDuration(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 font-sans text-sm text-text-dark"
-                  />
-                </div>
-                
-                <div className="p-3.5 bg-indigo-50/50 rounded-xl border border-indigo-100/40 text-[11px] text-indigo-800 font-sans leading-relaxed">
-                  Scheduling medications integrates them into the **AI Care Orchestrator**. Daily adherence reports and streak scores will automatically update on your dashboard.
-                </div>
-              </div>
-
-              <div className="flex gap-4 mt-6">
-                <button
-                  type="button"
-                  onClick={() => setShowAddForm(false)}
-                  className="flex-1 py-3 border border-gray-200 rounded-full font-display font-bold text-xs text-text-muted hover:bg-gray-50 transition-all cursor-pointer text-center"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 py-3 bg-indigo-600 text-white font-display font-bold text-xs rounded-full shadow-md text-center hover:bg-indigo-700 transition-all cursor-pointer"
-                >
-                  Register Schedule
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-      )}
 
       {/* 3. Daily Check-in & Reminders Checklist (Saves Lives!) */}
       <div className="bg-white p-6 rounded-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] border border-gray-100/80 space-y-5">

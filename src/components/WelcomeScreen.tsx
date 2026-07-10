@@ -28,12 +28,14 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { SaheliLogoSVG } from "./SaheliLogo";
 import { orchestrator } from "../services/orchestrator";
+import { useTranslation } from "../utils/translation";
 
 interface WelcomeScreenProps {
   onStart: () => void;
 }
 
 export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
+  const { t, currentLanguage } = useTranslation();
   const [view, setView] = useState<"landing" | "login" | "register" | "onboarding">("landing");
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -101,6 +103,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
       // Store session details
       localStorage.setItem("saheli_current_user", JSON.stringify(data.user));
       localStorage.setItem("saheli_token", data.token);
+      localStorage.setItem("saheli_preferred_language", data.user.preferredLanguage);
 
       // Initialize the scoped storage in the Orchestrator Service
       orchestrator.initializeUserWorkspace(data.user.id, data.user.fullName, data.user.preferredLanguage);
@@ -124,6 +127,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
       
       localStorage.setItem("saheli_current_user", JSON.stringify(fallbackUser));
       localStorage.setItem("saheli_token", "sess_offline_" + Math.random().toString(36).substring(2, 12));
+      localStorage.setItem("saheli_preferred_language", registerForm.preferredLanguage);
       orchestrator.initializeUserWorkspace(tempId, registerForm.fullName, registerForm.preferredLanguage);
 
       setView("onboarding");
@@ -158,6 +162,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
       // Save user session
       localStorage.setItem("saheli_current_user", JSON.stringify(data.user));
       localStorage.setItem("saheli_token", data.token);
+      localStorage.setItem("saheli_preferred_language", data.user.preferredLanguage || "English");
 
       // Dynamically load user scoped state
       orchestrator.loadUserState(data.user.id);
@@ -177,6 +182,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
   const handleGuestDemo = () => {
     localStorage.removeItem("saheli_current_user"); // Load default seed data
     orchestrator.loadUserState(null); // Set to default guest
+    localStorage.setItem("saheli_preferred_language", "Hindi (हिन्दी)");
     localStorage.setItem("saheli_onboarded", "true");
     onStart();
   };
@@ -259,6 +265,29 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
 
   return (
     <div id="welcome-screen" className="min-h-screen bg-bg-calm flex flex-col items-center justify-center p-4 md:p-8 relative overflow-y-auto">
+      {/* Floating Language Picker */}
+      <div className="absolute top-6 right-6 z-30 bg-white/90 backdrop-blur-md border border-gray-100/80 rounded-full px-4.5 py-2 shadow-sm flex items-center gap-2 hover:bg-white transition-all">
+        <Languages className="w-4 h-4 text-indigo-500" />
+        <select
+          value={currentLanguage}
+          onChange={(e) => {
+            localStorage.setItem("saheli_preferred_language", e.target.value);
+            window.dispatchEvent(new Event("storage"));
+            // Also notify orchestrator
+            orchestrator.updateLanguage(e.target.value);
+          }}
+          className="text-xs font-bold text-text-dark bg-transparent border-none outline-none cursor-pointer focus:ring-0 pr-1 py-0"
+        >
+          <option value="English">English</option>
+          <option value="Hindi (हिन्दी)">Hindi (हिन्दी)</option>
+          <option value="Bengali (বাংলা)">Bengali (বাংলা)</option>
+          <option value="Telugu (తెలుగు)">Telugu (తెలుగు)</option>
+          <option value="Tamil (தமிழ்)">Tamil (தமிழ்)</option>
+          <option value="Marathi (मराठी)">Marathi (मराठी)</option>
+          <option value="Odia (ଓଡ଼ିଆ)">Odia (ଓଡ଼ିଆ)</option>
+        </select>
+      </div>
+
       {/* Decorative Pastel Background Blobs */}
       <div className="absolute -top-48 -left-48 w-96 h-96 bg-pastel-blue opacity-30 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-48 -right-48 w-96 h-96 bg-pastel-pink opacity-35 rounded-full blur-3xl pointer-events-none"></div>
@@ -291,11 +320,10 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
 
               <div className="space-y-4 max-w-3xl">
                 <h1 className="text-3xl md:text-5xl font-display font-bold tracking-tight text-text-dark leading-tight">
-                  Healthcare designed to accompany you, <span className="text-pastel-text border-b-4 border-pastel-blue">every single day.</span>
+                  {t("Healthcare designed to accompany you, every single day.")}
                 </h1>
                 <p className="text-base md:text-lg text-text-muted max-w-2xl mx-auto leading-relaxed font-sans">
-                  Your health journey doesn't begin at the clinic, and it shouldn't end there. 
-                  We are Saheli—a lifelong secure multi-user workspace supporting you through every stage of life.
+                  {t("Welcome to Saheli")}. {t("Your empathetic health companion")} — {t("Choose your preferred regional dialect. Saheli rephrases complex clinical words into easy mother tongue explanations.")}
                 </p>
               </div>
 
@@ -306,9 +334,9 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
                     <div className="w-11 h-11 rounded-full bg-blue-50 flex items-center justify-center mb-4 border border-blue-100/50">
                       <Lock className="w-5 h-5 text-indigo-600" />
                     </div>
-                    <h3 className="font-display font-bold text-base text-text-dark tracking-tight">Isolated Privacy</h3>
+                    <h3 className="font-display font-bold text-base text-text-dark tracking-tight">{t("Isolated Privacy")}</h3>
                     <p className="text-xs text-text-muted mt-1.5 font-sans leading-relaxed">
-                      Your files, logs, and medical charts are strictly scoped and isolated. No sharing.
+                      {t("Your files, logs, and medical charts are strictly scoped and isolated. No sharing.")}
                     </p>
                   </div>
                 </div>
@@ -318,9 +346,9 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
                     <div className="w-11 h-11 rounded-full bg-pink-50 flex items-center justify-center mb-4 border border-pink-100/50">
                       <ShieldCheck className="w-5 h-5 text-pink-600" />
                     </div>
-                    <h3 className="font-display font-bold text-base text-text-dark tracking-tight">DPDP Compliant</h3>
+                    <h3 className="font-display font-bold text-base text-text-dark tracking-tight">{t("DPDP Compliant")}</h3>
                     <p className="text-xs text-text-muted mt-1.5 font-sans leading-relaxed">
-                      Complete transparency. Take total ownership and export or delete your health brain.
+                      {t("Complete transparency. Take total ownership and export or delete your health brain.")}
                     </p>
                   </div>
                 </div>
@@ -330,9 +358,9 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
                     <div className="w-11 h-11 rounded-full bg-purple-50 flex items-center justify-center mb-4 border border-purple-100/50">
                       <Sparkles className="w-5 h-5 text-purple-600" />
                     </div>
-                    <h3 className="font-display font-bold text-base text-text-dark tracking-tight">AI Orchestrator</h3>
+                    <h3 className="font-display font-bold text-base text-text-dark tracking-tight">{t("AI Orchestrator")}</h3>
                     <p className="text-xs text-text-muted mt-1.5 font-sans leading-relaxed">
-                      Powered by private, local-first intelligence that remembers and summaries wellness metrics.
+                      {t("Powered by private, local-first intelligence that remembers and summaries wellness metrics.")}
                     </p>
                   </div>
                 </div>
@@ -346,7 +374,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
                   className="w-full px-8 py-4 bg-gradient-to-r from-indigo-600 to-[#D8C4F1] text-white font-display font-bold rounded-full shadow-[0_8px_25px_rgba(79,70,229,0.15)] hover:scale-102 active:scale-98 transition-all duration-300 flex items-center justify-center gap-2 text-base border border-purple-200/50 cursor-pointer"
                 >
                   <User className="w-5 h-5" />
-                  Create Private Account
+                  {t("Join Saheli")}
                   <ArrowRight className="w-4 h-4 ml-1" />
                 </button>
                 
@@ -356,7 +384,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
                   className="w-full px-8 py-4 bg-white text-text-dark hover:text-indigo-600 font-display font-bold rounded-full shadow-sm hover:bg-gray-50/50 active:scale-98 transition-all duration-300 border border-gray-200/80 cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Lock className="w-4.5 h-4.5" />
-                  Sign In
+                  {t("Sign In")}
                 </button>
               </div>
 
@@ -365,11 +393,11 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
                 onClick={handleGuestDemo}
                 className="text-xs text-indigo-600 hover:underline font-bold mt-2 cursor-pointer flex items-center gap-1.5"
               >
-                <Smile className="w-4 h-4" /> Explore Priya Devi (Interactive Guest Sandbox)
+                <Smile className="w-4 h-4" /> {t("Explore Priya Devi (Interactive Guest Sandbox)")}
               </button>
 
               <p className="text-[10px] text-text-muted flex items-center justify-center gap-1.5 pt-6">
-                <HelpCircle className="w-3.5 h-3.5 text-purple-400" /> Supported by ASHA coordinators. DPDP Compliant Local Sandboxes.
+                <HelpCircle className="w-3.5 h-3.5 text-purple-400" /> {t("Supported by ASHA coordinators. DPDP Compliant Local Sandboxes.")}
               </p>
             </motion.div>
           )}
@@ -430,14 +458,14 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
                   onClick={handleLogin}
                   className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-display font-bold text-sm rounded-full transition-all cursor-pointer shadow-sm mt-3 flex items-center justify-center gap-2"
                 >
-                  {loading ? "Authenticating..." : "Unlock My Health Brain"}
+                  {loading ? t("Authenticating...") : t("Unlock My Health Brain")}
                 </button>
               </form>
 
               <div className="text-center pt-2">
-                <span className="text-xs text-text-muted font-sans">Don't have an account? </span>
+                <span className="text-xs text-text-muted font-sans">{t("Don't have an account? ")}</span>
                 <button onClick={() => setView("register")} className="text-xs text-indigo-600 hover:underline font-bold cursor-pointer">
-                  Create Private Workspace
+                  {t("Create Private Workspace")}
                 </button>
               </div>
             </motion.div>
@@ -457,8 +485,8 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
                   <ArrowLeft className="w-5 h-5" />
                 </button>
                 <div>
-                  <h2 className="text-xl font-display font-bold text-text-dark tracking-tight">Create Workspace</h2>
-                  <p className="text-xs text-text-muted font-sans">Initialize your secure DPDP database.</p>
+                  <h2 className="text-xl font-display font-bold text-text-dark tracking-tight">{t("Create Workspace")}</h2>
+                  <p className="text-xs text-text-muted font-sans">{t("Initialize your secure DPDP database.")}</p>
                 </div>
               </div>
 
@@ -532,6 +560,7 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-indigo-400 bg-white cursor-pointer font-sans"
                     >
                       <option value="English">English</option>
+                      <option value="Odia (ଓଡ଼ିଆ)">Odia (ଓଡ଼ିଆ)</option>
                       <option value="Hindi (हिन्दी)">Hindi (हिन्दी)</option>
                       <option value="Bengali (বাংলা)">Bengali (বাংলা)</option>
                       <option value="Telugu (తెలుగు)">Telugu (తెలుగు)</option>
@@ -547,14 +576,14 @@ export default function WelcomeScreen({ onStart }: WelcomeScreenProps) {
                   onClick={handleRegister}
                   className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-display font-bold text-sm rounded-full transition-all cursor-pointer shadow-sm mt-2 flex items-center justify-center gap-2"
                 >
-                  {loading ? "Registering Workspace..." : "Create My Lifelong Health Brain"}
+                  {loading ? t("Registering Workspace...") : t("Create My Lifelong Health Brain")}
                 </button>
               </form>
 
               <div className="text-center pt-2">
-                <span className="text-xs text-text-muted font-sans">Already have an account? </span>
+                <span className="text-xs text-text-muted font-sans">{t("Already have an account? ")}</span>
                 <button onClick={() => setView("login")} className="text-xs text-indigo-600 hover:underline font-bold cursor-pointer">
-                  Sign In
+                  {t("Sign In")}
                 </button>
               </div>
             </motion.div>

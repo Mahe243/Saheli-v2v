@@ -8,6 +8,7 @@ import { Smile, Heart, Sparkles, MessageSquare, History, Check } from "lucide-re
 import { orchestrator } from "../services/orchestrator";
 import { EmotionLog } from "../types";
 import { motion, AnimatePresence } from "motion/react";
+import { useTranslation } from "../utils/translation";
 
 const EMOTIONS: { name: EmotionLog["emotion"]; label: string; emoji: string; color: string; bg: string }[] = [
   { name: "Happy", label: "Happy / Khush", emoji: "😊", color: "text-emerald-600 border-emerald-200", bg: "bg-emerald-50/60" },
@@ -20,6 +21,7 @@ const EMOTIONS: { name: EmotionLog["emotion"]; label: string; emoji: string; col
 ];
 
 export default function EmotionalHealthView() {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState<EmotionLog[]>(orchestrator.getEmotionLogs());
   const [selectedEmotion, setSelectedEmotion] = useState<EmotionLog["emotion"] | null>(null);
   const [note, setNote] = useState("");
@@ -63,10 +65,10 @@ export default function EmotionalHealthView() {
             <Heart className="w-6 h-6 animate-pulse text-rose-500 fill-rose-500/20" />
           </div>
           <div>
-            <h2 className="text-xl md:text-2xl font-display font-bold text-text-dark">Daily Emotional Companion</h2>
+            <h2 className="text-xl md:text-2xl font-display font-bold text-text-dark">{t("Daily Emotional Companion")}</h2>
             <p className="text-text-muted text-sm mt-1 max-w-2xl leading-relaxed">
-              How are you feeling today, Priya? Sharing your emotions helps Saheli understand your energy and health patterns. 
-              <span className="font-semibold text-purple-700 block mt-1">Note: This companion is a supportive listener, not a replacement for medical therapy.</span>
+              {t("How are you feeling today, Priya? Sharing your emotions helps Saheli understand your energy and health patterns.")} 
+              <span className="font-semibold text-purple-700 block mt-1">{t("Note: This companion is a supportive listener, not a replacement for medical therapy.")}</span>
             </p>
           </div>
         </div>
@@ -78,7 +80,7 @@ export default function EmotionalHealthView() {
           <div className="bg-white p-6 md:p-8 rounded-[24px] shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-gray-100">
             <h3 className="font-display font-bold text-lg text-text-dark mb-4 flex items-center gap-2">
               <Smile className="w-5 h-5 text-pink-500" />
-              How is your mind feeling right now?
+              {t("How is your mind feeling right now?")}
             </h3>
 
             {/* Emotion Grid */}
@@ -96,7 +98,7 @@ export default function EmotionalHealthView() {
                     }`}
                   >
                     <span className="text-3xl mb-1">{item.emoji}</span>
-                    <span className="text-xs font-display font-bold tracking-tight">{item.label}</span>
+                    <span className="text-xs font-display font-bold tracking-tight">{t(item.label)}</span>
                   </button>
                 );
               })}
@@ -105,12 +107,12 @@ export default function EmotionalHealthView() {
             {/* Optional Note */}
             <div className="mt-6 space-y-2">
               <label className="text-xs font-display font-bold uppercase tracking-wider text-text-muted block">
-                Any notes or reasons? (Optional)
+                {t("Any notes or reasons? (Optional)")}
               </label>
               <textarea
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="Write down any thoughts, agricultural workload, or simple joy you experienced..."
+                placeholder={t("Write down any thoughts, agricultural workload, or simple joy you experienced...")}
                 rows={3}
                 className="w-full p-4 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent text-sm bg-gray-50/30 transition-all font-sans"
               />
@@ -130,12 +132,12 @@ export default function EmotionalHealthView() {
                 {isSubmitting ? (
                   <>
                     <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
-                    Saving check-in...
+                    {t("Saving check-in...")}
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4" />
-                    Register Mood
+                    {t("Register Mood")}
                   </>
                 )}
               </button>
@@ -157,12 +159,12 @@ export default function EmotionalHealthView() {
                     <Check className="w-5 h-5 stroke-[3]" />
                   </div>
                   <div className="space-y-1.5 flex-1">
-                    <h4 className="font-display font-bold text-emerald-800 text-base">Check-in Registered Successfully</h4>
+                    <h4 className="font-display font-bold text-emerald-800 text-base">{t("Check-in Registered Successfully")}</h4>
                     <p className="text-emerald-700/90 text-sm font-sans leading-relaxed italic">
                       "{justSavedLog.aiResponse}"
                     </p>
                     <span className="text-[10px] text-emerald-600/80 block mt-1">
-                      Our intelligence calibrated this log with your core bio-signals.
+                      {t("Our intelligence calibrated this log with your core bio-signals.")}
                     </span>
                   </div>
                 </div>
@@ -176,7 +178,7 @@ export default function EmotionalHealthView() {
           <div className="bg-white p-6 rounded-[24px] shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-gray-100 space-y-4">
             <h3 className="font-display font-bold text-lg text-text-dark flex items-center gap-2">
               <History className="w-5 h-5 text-indigo-500" />
-              Mood History
+              {t("Mood History")}
             </h3>
 
             <div className="space-y-4.5 max-h-96 overflow-y-auto pr-1 divide-y divide-gray-50">
@@ -189,7 +191,7 @@ export default function EmotionalHealthView() {
                         <div className="flex items-center gap-2">
                           <span className="text-2xl">{emotionDetail.emoji}</span>
                           <div>
-                            <span className="text-sm font-display font-bold text-text-dark block">{log.emotion}</span>
+                            <span className="text-sm font-display font-bold text-text-dark block">{t(log.emotion)}</span>
                             <span className="text-[10px] text-text-muted block">{log.date}</span>
                           </div>
                         </div>
@@ -203,7 +205,7 @@ export default function EmotionalHealthView() {
                         <div className="bg-purple-50/40 p-3 rounded-lg border border-purple-100/30 text-xs text-text-muted flex gap-2 items-start font-sans">
                           <MessageSquare className="w-3.5 h-3.5 text-purple-500 mt-0.5 flex-shrink-0" />
                           <p className="leading-relaxed italic">
-                            <span className="font-bold font-display text-[10px] uppercase text-purple-600 block mb-0.5">Saheli Comfort</span>
+                            <span className="font-bold font-display text-[10px] uppercase text-purple-600 block mb-0.5">{t("Saheli Comfort")}</span>
                             "{log.aiResponse}"
                           </p>
                         </div>
@@ -212,7 +214,7 @@ export default function EmotionalHealthView() {
                   );
                 })
               ) : (
-                <p className="text-xs text-text-muted text-center py-4 font-sans">No daily emotion check-ins recorded yet.</p>
+                <p className="text-xs text-text-muted text-center py-4 font-sans">{t("No daily emotion check-ins recorded yet.")}</p>
               )}
             </div>
           </div>

@@ -27,15 +27,21 @@ import {
 } from "lucide-react";
 import { orchestrator } from "../services/orchestrator";
 import { motion, AnimatePresence } from "motion/react";
+import { useTranslation } from "../utils/translation";
 
 export default function SettingsView() {
+  const { t } = useTranslation();
   const [user, setUser] = useState(() => {
     const raw = localStorage.getItem("saheli_current_user");
     return raw ? JSON.parse(raw) : null;
   });
 
   const [brain, setBrain] = useState(() => orchestrator.getHealthBrain());
-  const [language, setLanguage] = useState(user?.preferredLanguage || "English");
+  const [language, setLanguage] = useState(() => {
+    const saved = localStorage.getItem("saheli_preferred_language");
+    if (saved) return saved;
+    return user?.preferredLanguage || "English";
+  });
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -62,10 +68,17 @@ export default function SettingsView() {
   // Security Logs State
   const [securityLogs, setSecurityLogs] = useState<any[]>([]);
   const [showLogs, setShowLogs] = useState(false);
+  const [logsUnlocked, setLogsUnlocked] = useState(false);
+  const [logsPassword, setLogsPassword] = useState("");
+  const [logsError, setLogsError] = useState<string | null>(null);
+  const [logsLoading, setLogsLoading] = useState(false);
 
-  // Deletion confirmation
+  // Deletion and Archive Lock confirmation
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [showLockConfirm, setShowLockConfirm] = useState(false);
+  const [lockPassword, setLockPassword] = useState("");
+  const [lockError, setLockError] = useState<string | null>(null);
 
   useEffect(() => {
     // If we have an active user, parse contacts and sync preferences
@@ -120,6 +133,10 @@ export default function SettingsView() {
         bloodGroup: profileForm.bloodGroup,
         emergencyContact: `${profileForm.emergencyContactName} (${profileForm.emergencyContactPhone})`
       });
+
+      // Save language preference locally
+      localStorage.setItem("saheli_preferred_language", language);
+      orchestrator.addMemoryItem("language", "Preferred Language", language, "Configured in Settings Center Profile Sync");
 
       // 2. Post to backend DB if authenticated
       if (user) {
@@ -261,8 +278,79 @@ export default function SettingsView() {
     }
   };
 
+  const handleLockAndArchiveLogs = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    if (!lockPassword) {
+      setLockError("Please enter your password to secure your logs.");
+      return;
+    }
+
+    setLoading(true);
+    setLockError(null);
+    try {
+      // 1. Verify password with backend
+      const response = await fetch("/api/auth/verify-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, password: lockPassword })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        setLockError(data.error || "Incorrect password. Cannot lock account.");
+        setLoading(false);
+        return;
+      }
+
+      // 2. Clear onboarding and current user token session to lock the app, BUT keep all data in local/remote databases perfectly intact.
+      localStorage.removeItem("saheli_onboarded");
+      localStorage.removeItem("saheli_current_user");
+      localStorage.removeItem("saheli_token");
+      orchestrator.loadUserState(null);
+
+      setSuccessMsg("Account successfully secured, and all logs have been archived behind password-protection. Redirecting...");
+      setTimeout(() => {
+        window.location.reload();
+      }, 2500);
+    } catch (err) {
+      setLockError("Failed to verify password. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUnlockLogs = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!logsPassword) {
+      setLogsError("Please enter your password.");
+      return;
+    }
+    setLogsLoading(true);
+    setLogsError(null);
+    try {
+      const response = await fetch("/api/auth/verify-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user?.id, password: logsPassword })
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setLogsUnlocked(true);
+      } else {
+        setLogsError(data.error || "Incorrect password.");
+      }
+    } catch (err) {
+      setLogsError("Failed to verify password. Please try again.");
+    } finally {
+      setLogsLoading(false);
+    }
+  };
+
   const handleLanguageChange = async (lang: string) => {
     setLanguage(lang);
+    localStorage.setItem("saheli_preferred_language", lang);
+    orchestrator.addMemoryItem("language", "Preferred Language", lang, "Configured in Settings Center Language Grid");
+
     if (user) {
       try {
         await fetch("/api/auth/profile/update", {
@@ -409,7 +497,7 @@ export default function SettingsView() {
                 disabled={loading}
                 className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-display font-bold text-xs rounded-full transition-all cursor-pointer shadow-2xs"
               >
-                {loading ? "Saving Changes..." : "Sync & Lock Profile Vitals"}
+                {loading ? t("Saving Changes...") : t("Sync & Lock Profile Vitals")}
               </button>
             </form>
           </div>
@@ -420,25 +508,31 @@ export default function SettingsView() {
               <div className="p-2 bg-blue-50 rounded-lg text-blue-600 border border-blue-100/50">
                 <Languages className="w-4.5 h-4.5" />
               </div>
-              Language & Dialects
+              {t("Language & Dialects")}
             </h3>
             
             <p className="text-xs text-text-muted leading-relaxed font-sans text-left">
-              Choose your preferred regional dialect. Saheli rephrases complex clinical words into easy mother tongue explanations.
+              {t("Choose your preferred regional dialect.")}
             </p>
 
             <div className="grid grid-cols-2 gap-3 pt-1">
-              {["English", "Hindi (हिन्दी)", "Bengali (বাংলা)", "Telugu (తెలుగు)", "Tamil (தமிழ்)", "Marathi (मराठी)"].map((lang) => (
+              {[{ id: "English", label: "✅ English" },
+    { id: "Hindi", label: "🧪 Hindi (हिन्दी) • Beta" },
+    { id: "Bengali", label: "🧪 Bengali (বাংলা) • Beta" },
+    { id: "Telugu", label: "🧪 Telugu (తెలుగు) • Beta" },
+    { id: "Tamil", label: "🧪 Tamil (தமிழ்) • Beta" },
+    { id: "Marathi", label: "🧪 Marathi (मराठी) • Beta" },
+    { id: "Odia", label: "🧪 Odia (ଓଡ଼ିଆ) • Beta" }].map((lang) => (
                 <button
-                  key={lang}
-                  onClick={() => handleLanguageChange(lang)}
+                  key={lang.id}
+                  onClick={() => handleLanguageChange(lang.id)}
                   className={`p-3.5 rounded-[14px] text-xs font-bold border transition-all cursor-pointer text-left ${
                     language === lang 
                       ? "bg-[#D8C4F1]/20 border-[#D8C4F1] text-text-dark shadow-2xs" 
                       : "bg-gray-50/60 border-gray-200 text-text-muted hover:bg-gray-50"
                   }`}
                 >
-                  {lang}
+                  {lang.label}
                 </button>
               ))}
             </div>
@@ -532,17 +626,88 @@ export default function SettingsView() {
             </button>
           </div>
 
+          {/* Lock Account & Password-Protect Logs */}
+          <div className="bg-white p-6 md:p-8 rounded-[22px] border border-gray-100 shadow-sm space-y-4">
+            <h3 className="font-display font-bold text-lg text-text-dark flex items-center gap-2">
+              <div className="p-2 bg-indigo-50 rounded-lg text-indigo-600 border border-indigo-100/50">
+                <Lock className="w-4.5 h-4.5" />
+              </div>
+              {t("Lock Account & Archive Logs")}
+            </h3>
+
+            <p className="text-xs text-text-muted leading-relaxed font-sans text-left">
+              {t("Instead of permanently deleting your data, lock your security logs and clinical profile behind password protection. If at any point you want to see your logs or resume your care journey, simply enter your password to unlock them.")}
+            </p>
+
+            {user ? (
+              <>
+                {showLockConfirm ? (
+                  <form onSubmit={handleLockAndArchiveLogs} className="p-4.5 bg-indigo-50 border border-indigo-100 rounded-[18px] space-y-3.5 text-left font-sans">
+                    <p className="text-xs text-indigo-950 font-bold flex items-center gap-2 leading-relaxed">
+                      <Lock className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+                      <span>{t("Secure Account & Archive Logs")}</span>
+                    </p>
+                    {lockError && (
+                      <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-800 rounded-xl text-xs font-semibold flex items-center gap-2">
+                        <AlertTriangle className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" />
+                        <span>{lockError}</span>
+                      </div>
+                    )}
+                    <div>
+                      <label className="text-[11px] font-bold text-indigo-950 block mb-1">{t("Enter your account password to lock and archive logs")}</label>
+                      <input 
+                        type="password" 
+                        value={lockPassword}
+                        onChange={(e) => setLockPassword(e.target.value)}
+                        placeholder="Password"
+                        className="w-full px-4 py-2 rounded-xl border border-indigo-200 text-xs focus:outline-none focus:border-indigo-400 bg-white font-sans text-indigo-900"
+                        required
+                      />
+                    </div>
+                    <div className="flex gap-2 justify-end">
+                      <button 
+                        type="button"
+                        onClick={() => { setShowLockConfirm(false); setLockPassword(""); setLockError(null); }}
+                        className="px-4 py-1.5 text-xs bg-white border border-gray-200 text-text-dark rounded-full cursor-pointer font-bold"
+                      >
+                        {t("Cancel")}
+                      </button>
+                      <button 
+                        type="submit"
+                        disabled={loading}
+                        className="px-4 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-bold cursor-pointer transition-colors"
+                      >
+                        {loading ? t("Securing...") : t("Secure & Lock Profile")}
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <button
+                    onClick={() => setShowLockConfirm(true)}
+                    className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-display font-bold text-xs rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                  >
+                    <Lock className="w-4.5 h-4.5" /> {t("Archive, Lock & Password-Protect Account Logs")}
+                  </button>
+                )}
+              </>
+            ) : (
+              <div className="p-4 bg-gray-50 border border-gray-100 rounded-[18px] text-xs text-text-muted leading-relaxed text-left">
+                {t("You are currently exploring as an anonymous guest. Since guest accounts run completely in secure local memory, there are no remote database logs to archive.")}
+              </div>
+            )}
+          </div>
+
           {/* Account Deletion */}
           <div className="bg-white p-6 md:p-8 rounded-[22px] border border-gray-100 shadow-sm space-y-4">
             <h3 className="font-display font-bold text-lg text-text-dark flex items-center gap-2">
               <div className="p-2 bg-rose-50 rounded-lg text-rose-600 border border-rose-100/50">
                 <Trash2 className="w-4.5 h-4.5" />
               </div>
-              Account Erasure (DPDP Right to be Forgotten)
+              {t("Account Erasure (DPDP Right to be Forgotten)")}
             </h3>
 
             <p className="text-xs text-text-muted leading-relaxed font-sans text-left">
-              Exercise your DPDP right. Permanently erase your account, authentications, emergency contacts, symptoms, and gynaecological audit logs. This cannot be undone.
+              {t("Permanently erase your entire footprint from our database. All timeline history, doctor connections, and security audit logs will be permanently purged from the cloud, and cannot be recovered.")}
             </p>
 
             {user ? (
@@ -551,10 +716,10 @@ export default function SettingsView() {
                   <div className="p-4.5 bg-rose-50 border border-rose-100 rounded-[18px] space-y-3.5 text-left font-sans">
                     <p className="text-xs text-rose-800 font-bold flex items-center gap-2 leading-relaxed">
                       <AlertTriangle className="w-5 h-5 text-rose-600 flex-shrink-0" />
-                      <span>Warning: This will permanently wipe all charts, and cannot be recovered!</span>
+                      <span>{t("Warning: This will permanently wipe all logs and charts, and cannot be recovered!")}</span>
                     </p>
                     <div>
-                      <label className="text-[11px] font-bold text-rose-800 block mb-1">Type 'delete' to confirm account deletion</label>
+                      <label className="text-[11px] font-bold text-rose-800 block mb-1">{t("Type 'delete' to confirm account deletion")}</label>
                       <input 
                         type="text" 
                         value={deleteConfirmText}
@@ -568,13 +733,13 @@ export default function SettingsView() {
                         onClick={() => setShowDeleteConfirm(false)}
                         className="px-4 py-1.5 text-xs bg-white border border-gray-200 text-text-dark rounded-full cursor-pointer font-bold"
                       >
-                        Cancel
+                        {t("Cancel")}
                       </button>
                       <button 
                         onClick={handleDeleteAccount}
                         className="px-4 py-1.5 text-xs bg-rose-600 hover:bg-rose-700 text-white rounded-full font-bold cursor-pointer transition-colors"
                       >
-                        Wipe My Footprint
+                        {t("Wipe My Footprint")}
                       </button>
                     </div>
                   </div>
@@ -583,13 +748,13 @@ export default function SettingsView() {
                     onClick={() => setShowDeleteConfirm(true)}
                     className="w-full py-4 border border-rose-200 hover:border-rose-300 text-rose-600 hover:bg-rose-50/20 font-display font-bold text-xs rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
                   >
-                    <Trash2 className="w-4.5 h-4.5" /> Erase Account & All Data Silos
+                    <Trash2 className="w-4.5 h-4.5" /> {t("Erase Account & All Data Silos")}
                   </button>
                 )}
               </>
             ) : (
               <div className="p-4 bg-gray-50 border border-gray-100 rounded-[18px] text-xs text-text-muted leading-relaxed text-left">
-                You are currently exploring as an anonymous guest. No cloud database footprint is stored for this session. Wiping guest local storage can be done by reseting your browser cache.
+                {t("You are currently exploring as an anonymous guest. No cloud database footprint is stored for this session. Wiping guest local storage can be done by reseting your browser cache.")}
               </div>
             )}
           </div>
@@ -628,46 +793,81 @@ export default function SettingsView() {
                 exit={{ opacity: 0, height: 0 }}
                 className="overflow-hidden pt-2"
               >
-                <div className="overflow-x-auto border border-gray-100 rounded-[16px]">
-                  <table className="w-full text-xs font-sans text-left">
-                    <thead>
-                      <tr className="bg-gray-50/60 border-b border-gray-100 text-text-muted font-bold">
-                        <th className="p-3">Timestamp</th>
-                        <th className="p-3">Action</th>
-                        <th className="p-3">Details</th>
-                        <th className="p-3">IP Address</th>
-                        <th className="p-3">Client Access Device (User Agent)</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                      {securityLogs.length > 0 ? (
-                        securityLogs.map((log) => (
-                          <tr key={log.id} className="hover:bg-gray-50/40">
-                            <td className="p-3 text-text-muted whitespace-nowrap">{new Date(log.timestamp).toLocaleString()}</td>
-                            <td className="p-3 whitespace-nowrap">
-                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                                log.action === "Login Success" || log.action === "Consent Accepted" || log.action === "Register"
-                                  ? "bg-emerald-50 text-emerald-800" 
-                                  : log.action === "Login Failed" || log.action === "Consent Revoked"
-                                  ? "bg-rose-50 text-rose-800"
-                                  : "bg-blue-50 text-blue-800"
-                              }`}>
-                                {log.action}
-                              </span>
-                            </td>
-                            <td className="p-3 text-text-dark font-medium max-w-xs truncate" title={log.details}>{log.details}</td>
-                            <td className="p-3 text-text-muted whitespace-nowrap font-mono">{log.ipAddress}</td>
-                            <td className="p-3 text-text-muted max-w-xs truncate font-mono" title={log.userAgent}>{log.userAgent}</td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={5} className="p-6 text-center text-text-muted">No security events found.</td>
+                {!logsUnlocked ? (
+                  <form onSubmit={handleUnlockLogs} className="p-5 border border-indigo-100 bg-indigo-50/20 rounded-[18px] max-w-md space-y-3.5">
+                    <p className="text-xs text-indigo-950 font-bold flex items-center gap-2 leading-relaxed">
+                      <Lock className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+                      <span>Security Verification Required</span>
+                    </p>
+                    <p className="text-[11px] text-text-muted leading-relaxed">
+                      Please enter your account password to unlock and inspect your secure security access logs.
+                    </p>
+                    {logsError && (
+                      <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-800 rounded-xl text-xs font-semibold flex items-center gap-2">
+                        <AlertTriangle className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" />
+                        <span>{logsError}</span>
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <input 
+                        type="password" 
+                        value={logsPassword}
+                        onChange={(e) => setLogsPassword(e.target.value)}
+                        placeholder="Enter password"
+                        className="flex-1 px-3 py-2 rounded-xl border border-gray-200 text-xs focus:outline-none focus:border-indigo-400 bg-white"
+                        required
+                      />
+                      <button 
+                        type="submit"
+                        disabled={logsLoading}
+                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs"
+                      >
+                        {logsLoading ? "Verifying..." : "Unlock Logs"}
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="overflow-x-auto border border-gray-100 rounded-[16px]">
+                    <table className="w-full text-xs font-sans text-left">
+                      <thead>
+                        <tr className="bg-gray-50/60 border-b border-gray-100 text-text-muted font-bold">
+                          <th className="p-3">Timestamp</th>
+                          <th className="p-3">Action</th>
+                          <th className="p-3">Details</th>
+                          <th className="p-3">IP Address</th>
+                          <th className="p-3">Client Access Device (User Agent)</th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {securityLogs.length > 0 ? (
+                          securityLogs.map((log) => (
+                            <tr key={log.id} className="hover:bg-gray-50/40">
+                              <td className="p-3 text-text-muted whitespace-nowrap">{new Date(log.timestamp).toLocaleString()}</td>
+                              <td className="p-3 whitespace-nowrap">
+                                <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                                  log.action === "Login Success" || log.action === "Consent Accepted" || log.action === "Register"
+                                    ? "bg-emerald-50 text-emerald-800" 
+                                    : log.action === "Login Failed" || log.action === "Consent Revoked"
+                                    ? "bg-rose-50 text-rose-800"
+                                    : "bg-blue-50 text-blue-800"
+                                }`}>
+                                  {log.action}
+                                </span>
+                              </td>
+                              <td className="p-3 text-text-dark font-medium max-w-xs truncate" title={log.details}>{log.details}</td>
+                              <td className="p-3 text-text-muted whitespace-nowrap font-mono">{log.ipAddress}</td>
+                              <td className="p-3 text-text-muted max-w-xs truncate font-mono" title={log.userAgent}>{log.userAgent}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={5} className="p-6 text-center text-text-muted">No security events found.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

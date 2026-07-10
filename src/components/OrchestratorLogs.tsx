@@ -6,10 +6,20 @@
 import React, { useState, useEffect } from "react";
 import { orchestrator } from "../services/orchestrator";
 import { OrchestratorEvent } from "../types";
-import { Terminal, Cpu, Share2, Layers, CheckCircle } from "lucide-react";
+import { Terminal, Cpu, Share2, Layers, CheckCircle, Lock, ShieldCheck, AlertTriangle } from "lucide-react";
+import { useTranslation } from "../utils/translation";
 
 export default function OrchestratorLogs() {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState<OrchestratorEvent[]>(orchestrator.getSystemLogs());
+  const [user, setUser] = useState(() => {
+    const raw = localStorage.getItem("saheli_current_user");
+    return raw ? JSON.parse(raw) : null;
+  });
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [password, setPassword] = useState("");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // Subscribe to all event logs dynamically
@@ -19,6 +29,98 @@ export default function OrchestratorLogs() {
     return () => unsub();
   }, []);
 
+  const handleUnlock = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!password) {
+      setErrorMsg("Please enter your password.");
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg(null);
+
+    if (!user) {
+      // Guest demo password verification
+      if (password.toLowerCase() === "saheli" || password === "priya") {
+        setIsUnlocked(true);
+      } else {
+        setErrorMsg("Incorrect sandbox password. Use 'saheli' to unlock guest logs.");
+      }
+      setLoading(false);
+    } else {
+      try {
+        const response = await fetch("/api/auth/verify-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: user.id, password })
+        });
+        const data = await response.json();
+        if (response.ok && data.success) {
+          setIsUnlocked(true);
+        } else {
+          setErrorMsg(data.error || "Incorrect password.");
+        }
+      } catch (err) {
+        setErrorMsg("Failed to verify password. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  if (!isUnlocked) {
+    return (
+      <div id="orchestrator-logs-auth-view" className="max-w-md mx-auto p-4 md:p-8 animate-fade-in mt-12">
+        <div className="bg-white p-6 md:p-8 rounded-[24px] shadow-lg border border-gray-100 text-center space-y-6">
+          <div className="mx-auto w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center border border-indigo-100">
+            <Lock className="w-7 h-7" />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-2xl font-display font-bold text-text-dark">{t("Enter Password to View Logs")}</h2>
+            <p className="text-xs text-text-muted leading-relaxed font-sans">
+              {t("To guarantee your clinical confidentiality (DPDP compliance), please enter your account password to decrypt and view the real-time system logs.")}
+            </p>
+          </div>
+
+          {errorMsg && (
+            <div className="p-3 bg-rose-50 border border-rose-100 text-rose-800 rounded-[14px] text-xs font-semibold flex items-center gap-2 text-left font-sans">
+              <AlertTriangle className="w-4 h-4 text-rose-600 flex-shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleUnlock} className="space-y-4 font-sans text-left">
+            <div>
+              <label className="text-[11px] font-bold text-text-dark uppercase tracking-wider block mb-1.5">{t("Password")}</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={t("Enter password")}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 font-sans"
+                required
+              />
+              {!user && (
+                <p className="text-[10px] text-indigo-600 font-bold mt-1.5 leading-normal">
+                  💡 Hint: You are browsing as a guest. Use guest password <code className="bg-indigo-50 px-1 py-0.5 rounded font-mono font-bold">saheli</code>.
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-display font-bold text-xs rounded-full transition-all cursor-pointer shadow-md flex items-center justify-center gap-2"
+            >
+              {loading ? t("Verifying...") : t("Unlock Real-Time Event Stream")}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div id="orchestrator-logs-view" className="space-y-8 max-w-5xl mx-auto p-1 animate-fade-in">
       
@@ -26,10 +128,10 @@ export default function OrchestratorLogs() {
       <div className="border-b border-gray-100 pb-5">
         <h1 className="text-3xl font-display font-bold text-text-dark flex items-center gap-2.5 tracking-tight">
           <Cpu className="w-8 h-8 text-indigo-500" />
-          AI Care Orchestrator Logs
+          {t("AI Care Orchestrator Logs")}
         </h1>
         <p className="text-text-muted mt-1.5 text-sm md:text-base font-sans">
-          Inspect the real-time event-driven architecture of the Women's Health Operating System.
+          {t("Inspect the real-time event-driven architecture of the Women's Health Operating System.")}
         </p>
       </div>
 

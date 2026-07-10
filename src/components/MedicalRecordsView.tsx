@@ -24,8 +24,10 @@ import {
 } from "lucide-react";
 import { orchestrator } from "../services/orchestrator";
 import { MedicalRecord, MedicalRecordCategory } from "../types";
+import { useTranslation } from "../utils/translation";
 
 export default function MedicalRecordsView() {
+  const { t } = useTranslation();
   const [records, setRecords] = useState<MedicalRecord[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -148,10 +150,10 @@ export default function MedicalRecordsView() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-display font-bold text-text-dark tracking-tight leading-tight">
-            Smart Medical Records
+            {t("Smart Medical Records")}
           </h1>
           <p className="text-text-muted mt-1 text-sm font-sans">
-            Store and organize your healthcare records with military-grade encryption & safe sharing consents.
+            {t("Store and organize your healthcare records with military-grade encryption & safe sharing consents.")}
           </p>
         </div>
         <button
@@ -159,7 +161,7 @@ export default function MedicalRecordsView() {
           className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-[#D8C4F1] text-white font-display font-bold rounded-full shadow-[0_4px_15px_rgba(79,70,229,0.15)] hover:scale-102 active:scale-98 transition-all cursor-pointer border border-purple-200/50"
         >
           <Plus className="w-5 h-5" />
-          <span>Upload New Record</span>
+          <span>{t("Upload New Record")}</span>
         </button>
       </div>
 
@@ -169,16 +171,16 @@ export default function MedicalRecordsView() {
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-pink-50 to-transparent rounded-bl-full"></div>
           <h3 className="font-display font-bold text-lg text-text-dark mb-4 flex items-center gap-2">
             <Upload className="w-5 h-5 text-indigo-600" />
-            Upload Healthcare Document
+            {t("Upload Healthcare Document")}
           </h3>
 
           <form onSubmit={handleUploadSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">Document Title *</label>
+                <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">{t("Document Title *")}</label>
                 <input
                   type="text"
-                  placeholder="e.g. CBC Blood Report, Eye Prescription"
+                  placeholder={t("e.g. CBC Blood Report, Eye Prescription")}
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   required
@@ -188,19 +190,19 @@ export default function MedicalRecordsView() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">Category *</label>
+                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">{t("Category *")}</label>
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value as MedicalRecordCategory)}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 font-sans text-sm text-text-dark"
                   >
                     {categories.slice(1).map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
+                      <option key={cat} value={cat}>{t(cat)}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">Record Date *</label>
+                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">{t("Record Date *")}</label>
                   <input
                     type="date"
                     value={newDate}
@@ -213,20 +215,20 @@ export default function MedicalRecordsView() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">Hospital / Clinic</label>
+                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">{t("Hospital / Clinic")}</label>
                   <input
                     type="text"
-                    placeholder="e.g. PHC Village Clinic"
+                    placeholder={t("e.g. PHC Village Clinic")}
                     value={newHospital}
                     onChange={(e) => setNewHospital(e.target.value)}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 font-sans text-sm text-text-dark"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">Doctor / Counselor</label>
+                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">{t("Doctor / Counselor")}</label>
                   <input
                     type="text"
-                    placeholder="e.g. Dr. Anjali Mehta"
+                    placeholder={t("e.g. Dr. Anjali Mehta")}
                     value={newDoctor}
                     onChange={(e) => setNewDoctor(e.target.value)}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 font-sans text-sm text-text-dark"
@@ -238,7 +240,7 @@ export default function MedicalRecordsView() {
             {/* Drag & Drop Area */}
             <div className="flex flex-col justify-between">
               <div>
-                <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">Attach File *</label>
+                <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1.5">{t("Attach File *")}</label>
                 <div
                   onDragEnter={handleDrag}
                   onDragOver={handleDrag}
@@ -257,8 +259,8 @@ export default function MedicalRecordsView() {
                     accept=".pdf,image/*"
                   />
                   <Upload className="w-8 h-8 text-indigo-500 mb-2.5" />
-                  <p className="text-xs text-text-dark font-semibold font-sans">Drag & drop your medical record, or click to browse</p>
-                  <p className="text-[10px] text-text-muted mt-1">Supports PDF, Images (Max 10MB)</p>
+                  <p className="text-xs text-text-dark font-semibold font-sans">{t("Drag & drop your medical record, or click to browse")}</p>
+                  <p className="text-[10px] text-text-muted mt-1">{t("Supports PDF, Images (Max 10MB)")}</p>
                   
                   {uploadedFile && (
                     <div className="mt-3 px-3 py-1.5 bg-indigo-50 rounded-lg border border-indigo-100 flex items-center gap-2 text-xs text-indigo-700 font-medium">
@@ -276,7 +278,7 @@ export default function MedicalRecordsView() {
                   onClick={() => setShowUploadForm(false)}
                   className="flex-1 py-3 border border-gray-200 rounded-full font-display font-bold text-xs text-text-muted hover:bg-gray-50 transition-all cursor-pointer text-center"
                 >
-                  Cancel
+                  {t("Cancel")}
                 </button>
                 <button
                   type="submit"
@@ -287,7 +289,7 @@ export default function MedicalRecordsView() {
                       : "bg-indigo-600 hover:bg-indigo-700"
                   }`}
                 >
-                  Process with AI Engine
+                  {t("Process with AI Engine")}
                 </button>
               </div>
             </div>
@@ -302,7 +304,7 @@ export default function MedicalRecordsView() {
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-text-muted" />
           <input
             type="text"
-            placeholder="Search reports by Doctor, Hospital, test name..."
+            placeholder={t("Search reports by Doctor, Hospital, test name...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-100 rounded-xl shadow-[0_4px_15px_rgba(0,0,0,0.01)] focus:outline-none focus:border-indigo-500 font-sans text-xs text-text-dark placeholder-gray-400"
@@ -321,7 +323,7 @@ export default function MedicalRecordsView() {
                   : "bg-white text-text-muted border-gray-100 hover:bg-gray-50 hover:text-text-dark"
               }`}
             >
-              {cat}
+              {t(cat)}
             </button>
           ))}
         </div>
@@ -332,7 +334,7 @@ export default function MedicalRecordsView() {
         
         {/* Document Cards List */}
         <div className="lg:col-span-2 space-y-4">
-          <h3 className="font-display font-bold text-lg text-text-dark">All Encrypted Records ({filteredRecords.length})</h3>
+          <h3 className="font-display font-bold text-lg text-text-dark">{t("All Encrypted Records")} ({filteredRecords.length})</h3>
           
           {filteredRecords.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -348,11 +350,11 @@ export default function MedicalRecordsView() {
                     {/* Top indicator bar */}
                     <div className="flex items-center justify-between mb-3">
                       <span className="px-2.5 py-0.5 bg-pastel-blue text-indigo-700 text-[10px] font-bold rounded-full font-mono uppercase">
-                        {rec.category}
+                        {t(rec.category)}
                       </span>
                       <span className="text-[10px] text-text-muted font-bold flex items-center gap-1">
                         <Lock className="w-3 h-3 text-emerald-500" />
-                        Encrypted
+                        {t("Encrypted")}
                       </span>
                     </div>
 
@@ -380,15 +382,15 @@ export default function MedicalRecordsView() {
           ) : (
             <div className="bg-white py-12 px-6 rounded-[24px] border border-gray-100 text-center text-text-muted">
               <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-sm font-sans font-medium">No medical records found matching your selection.</p>
-              <p className="text-xs mt-1">Try resetting the search filter or upload a new record above!</p>
+              <p className="text-sm font-sans font-medium">{t("No medical records found matching your selection.")}</p>
+              <p className="text-xs mt-1">{t("Try resetting the search filter or upload a new record above!")}</p>
             </div>
           )}
         </div>
 
         {/* Smart Preview Panel */}
         <div className="space-y-4">
-          <h3 className="font-display font-bold text-lg text-text-dark">Security & Quick Preview</h3>
+          <h3 className="font-display font-bold text-lg text-text-dark">{t("Security & Quick Preview")}</h3>
           
           {selectedRecord ? (
             <div className="bg-white p-6 rounded-[24px] shadow-[0_10px_35px_rgba(0,0,0,0.015)] border border-gray-100/80 space-y-6 relative overflow-hidden animate-scale-in">
@@ -396,7 +398,7 @@ export default function MedicalRecordsView() {
               
               <div className="space-y-2">
                 <span className="px-2.5 py-0.5 bg-indigo-50 text-indigo-700 text-[9px] font-bold rounded-full font-mono uppercase">
-                  {selectedRecord.category}
+                  {t(selectedRecord.category)}
                 </span>
                 <h4 className="font-display font-bold text-text-dark text-base">{selectedRecord.title}</h4>
                 <p className="text-xs text-text-muted font-sans">{selectedRecord.hospital} | {selectedRecord.doctor}</p>
@@ -406,27 +408,27 @@ export default function MedicalRecordsView() {
               <div className="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100/50 space-y-2.5">
                 <div className="flex items-center gap-2 text-emerald-800 text-xs font-bold">
                   <Shield className="w-4 h-4 text-emerald-500" />
-                  <span>Secure Patient Privacy Details</span>
+                  <span>{t("Secure Patient Privacy Details")}</span>
                 </div>
                 <ul className="text-[11px] text-emerald-800/90 font-sans space-y-1.5">
                   <li className="flex items-center gap-1.5">
                     <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>Double Encrypted SHA-256 Storage</span>
+                    <span>{t("Double Encrypted SHA-256 Storage")}</span>
                   </li>
                   <li className="flex items-center gap-1.5">
                     <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>Consented Doctors: <strong>{selectedRecord.consentSharedWith.join(", ")}</strong></span>
+                    <span>{t("Consented Doctors")}: <strong>{selectedRecord.consentSharedWith.join(", ")}</strong></span>
                   </li>
                   <li className="flex items-center gap-1.5">
                     <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>Role-based credentials verified</span>
+                    <span>{t("Role-based credentials verified")}</span>
                   </li>
                 </ul>
               </div>
 
               {/* File Info */}
               <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block">Attached File</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted block">{t("Attached File")}</span>
                 <div className="flex items-center justify-between text-xs font-sans">
                   <span className="font-semibold text-text-dark truncate max-w-[150px]">{selectedRecord.fileName}</span>
                   <span className="text-text-muted font-mono">{selectedRecord.fileSize}</span>
@@ -439,14 +441,14 @@ export default function MedicalRecordsView() {
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 flex items-center gap-1">
                       <Activity className="w-3.5 h-3.5" />
-                      Lab Metrics Found
+                      {t("Lab Metrics Found")}
                     </span>
-                    <span className="text-[10px] font-bold text-indigo-500">{selectedRecord.labReport.metrics.length} Biomarkers</span>
+                    <span className="text-[10px] font-bold text-indigo-500">{selectedRecord.labReport.metrics.length} {t("Biomarkers")}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-[10px] font-sans">
                     {selectedRecord.labReport.metrics.map(m => (
                       <div key={m.name} className="bg-white/80 p-2 rounded-lg border border-indigo-100/30 flex items-center justify-between">
-                        <span className="font-medium text-text-dark">{m.name}</span>
+                        <span className="font-medium text-text-dark">{t(m.name)}</span>
                         <span className={`font-bold ${m.status === "Low" ? "text-rose-500" : m.status === "High" ? "text-amber-500" : "text-emerald-500"}`}>
                           {m.value} {m.status === "Low" ? "L" : m.status === "High" ? "H" : "N"}
                         </span>
@@ -463,12 +465,12 @@ export default function MedicalRecordsView() {
                   className="flex-1 py-2.5 bg-gray-900 text-white rounded-xl font-display font-semibold text-xs flex items-center justify-center gap-2 hover:bg-black transition-all cursor-pointer"
                 >
                   <Eye className="w-4 h-4" />
-                  View Original File
+                  {t("View Original File")}
                 </button>
                 <button
                   onClick={() => alert(`Consented access credentials successfully compiled for Dr. Anjali Mehta and local worker Sunita.`)}
                   className="px-3.5 py-2.5 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-all cursor-pointer flex items-center justify-center"
-                  title="Share Consented Access Link"
+                  title={t("Share Consented Access Link")}
                 >
                   <Share2 className="w-4 h-4" />
                 </button>
@@ -478,7 +480,7 @@ export default function MedicalRecordsView() {
           ) : (
             <div className="bg-white p-8 rounded-[24px] border border-dashed border-gray-200 text-center text-text-muted">
               <FileText className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-              <p className="text-xs font-sans font-medium">Select any health record card on the left to see private credentials and preview contents.</p>
+              <p className="text-xs font-sans font-medium">{t("Select any health record card on the left to see private credentials and preview contents.")}</p>
             </div>
           )}
         </div>

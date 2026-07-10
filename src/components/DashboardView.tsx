@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { orchestrator } from "../services/orchestrator";
 import { HealthBrain, HealthSummary, TimelineEvent, Appointment } from "../types";
+import { useTranslation } from "../utils/translation";
 
 // Phase 3 Modular Sub-Views
 import EmotionalHealthView from "./EmotionalHealthView";
@@ -30,6 +31,7 @@ import WeeklyCheckInView from "./WeeklyCheckInView";
 import HealthJournalView from "./HealthJournalView";
 import HealthGoalsView from "./HealthGoalsView";
 import SisterhoodView from "./SisterhoodView";
+import AppointmentModal from "./AppointmentModal";
 
 interface DashboardViewProps {
   onNavigate: (tab: string) => void;
@@ -37,10 +39,12 @@ interface DashboardViewProps {
 }
 
 export default function DashboardView({ onNavigate, onOpenSymptomModal }: DashboardViewProps) {
+  const { t } = useTranslation();
   const [brain, setBrain] = useState<HealthBrain>(orchestrator.getHealthBrain());
   const [summary, setSummary] = useState<HealthSummary>(orchestrator.getHealthSummary());
   const [timeline, setTimeline] = useState<TimelineEvent[]>(orchestrator.getTimeline());
   const [appointments, setAppointments] = useState<Appointment[]>(orchestrator.getAppointments());
+  const [isApptModalOpen, setIsApptModalOpen] = useState(false);
 
   // Phase 3 active companion sub-tab state
   const [activeCompanionTab, setActiveCompanionTab] = useState<"care" | "emotion" | "lifestage" | "checkin" | "journal" | "goals" | "sisterhood">("sisterhood");
@@ -70,15 +74,15 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl md:text-4xl font-display font-bold text-text-dark tracking-tight leading-tight">
-            {getGreeting()}, <span className="bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-transparent">{brain.profile.name}</span>
+            {t(getGreeting())}, <span className="bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-transparent">{brain.profile.name}</span>
           </h1>
           <p className="text-text-muted mt-1 text-sm md:text-base font-sans">
-            Your lifelong healthcare memory is completely secure and up to date.
+            {t("Your lifelong healthcare memory is completely secure and up to date.")}
           </p>
         </div>
         <div className="flex items-center gap-2 px-4 py-2.5 bg-white rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.02)] border border-emerald-100 text-xs md:text-sm font-semibold text-emerald-800">
           <ShieldCheck className="w-5 h-5 text-emerald-500" />
-          <span>Saheli Verified Care</span>
+          <span>{t("Saheli Verified Care")}</span>
         </div>
       </div>
 
@@ -98,7 +102,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
               <div className="p-2.5 bg-gradient-to-tr from-[#D8C4F1]/30 to-[#D8C4F1]/10 rounded-xl text-indigo-600 border border-[#D8C4F1]/40">
                 <Brain className="w-5 h-5" />
               </div>
-              <span className="text-lg tracking-tight">Personal Health Brain Summary</span>
+              <span className="text-lg tracking-tight">{t("Personalized Health Summary")}</span>
               <span className="ml-auto text-[11px] font-mono font-bold text-text-muted bg-gray-100/80 px-2.5 py-1 rounded-full border border-gray-200/50">
                 Updated {summary.updatedAt}
               </span>
@@ -149,7 +153,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                   }`}
                 >
                   <span className="text-sm">{tab.icon}</span>
-                  <span>{tab.label}</span>
+                  <span>{t(tab.label)}</span>
                 </motion.button>
               );
             })}
@@ -158,7 +162,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
           <div className="transition-all duration-300">
             {activeCompanionTab === "care" && (
               <div className="space-y-4">
-                <h3 className="font-display font-bold text-xl text-text-dark tracking-tight">Your Care Suite</h3>
+                <h3 className="font-display font-bold text-xl text-text-dark tracking-tight">{t("Your Care Suite")}</h3>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   {/* QA 1 */}
@@ -174,8 +178,8 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                         <Plus className="w-5 h-5 stroke-[2.5]" />
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-text-dark text-base">Update Symptoms</h4>
-                        <p className="text-xs text-text-muted mt-0.5 font-sans">Quickly record how you feel today</p>
+                        <h4 className="font-display font-bold text-text-dark text-base">{t("Update Symptoms")}</h4>
+                        <p className="text-xs text-text-muted mt-0.5 font-sans">{t("Quickly record how you feel today")}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
@@ -194,8 +198,8 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                         <MessageSquare className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-text-dark text-base">AI Consultation</h4>
-                        <p className="text-xs text-text-muted mt-0.5 font-sans">Continuous health checks</p>
+                        <h4 className="font-display font-bold text-text-dark text-base">{t("AI Consultation")}</h4>
+                        <p className="text-xs text-text-muted mt-0.5 font-sans">{t("Continuous health checks")}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
@@ -214,8 +218,8 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                         <Brain className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-text-dark text-base">Health Brain Dossier</h4>
-                        <p className="text-xs text-text-muted mt-0.5 font-sans">Review medical archives</p>
+                        <h4 className="font-display font-bold text-text-dark text-base">{t("Health Brain Dossier")}</h4>
+                        <p className="text-xs text-text-muted mt-0.5 font-sans">{t("Review medical archives")}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
@@ -234,8 +238,8 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                         <Calendar className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-text-dark text-base">Care Journey Timeline</h4>
-                        <p className="text-xs text-text-muted mt-0.5 font-sans">View chronological timeline</p>
+                        <h4 className="font-display font-bold text-text-dark text-base">{t("Care Journey Timeline")}</h4>
+                        <p className="text-xs text-text-muted mt-0.5 font-sans">{t("View chronological timeline")}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
@@ -254,8 +258,8 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                         <FileText className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-text-dark text-base">Medical Records</h4>
-                        <p className="text-xs text-text-muted mt-0.5 font-sans">Securely store encrypted PDFs/scans</p>
+                        <h4 className="font-display font-bold text-text-dark text-base">{t("Medical Records")}</h4>
+                        <p className="text-xs text-text-muted mt-0.5 font-sans">{t("Securely store encrypted PDFs/scans")}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
@@ -274,8 +278,8 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                         <Activity className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-text-dark text-base">Lab Intelligence</h4>
-                        <p className="text-xs text-text-muted mt-0.5 font-sans">Biomarker explanations & ranges</p>
+                        <h4 className="font-display font-bold text-text-dark text-base">{t("Lab Intelligence")}</h4>
+                        <p className="text-xs text-text-muted mt-0.5 font-sans">{t("Biomarker explanations & ranges")}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
@@ -294,8 +298,8 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                         <Stethoscope className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-text-dark text-base">Doctor Companion</h4>
-                        <p className="text-xs text-text-muted mt-0.5 font-sans">Pre-visit brief & post-visit sync</p>
+                        <h4 className="font-display font-bold text-text-dark text-base">{t("Doctor Companion")}</h4>
+                        <p className="text-xs text-text-muted mt-0.5 font-sans">{t("Pre-visit brief & post-visit sync")}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
@@ -314,8 +318,8 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                         <Bookmark className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-text-dark text-base">Medication Dashboard</h4>
-                        <p className="text-xs text-text-muted mt-0.5 font-sans">Daily adherence checks & logs</p>
+                        <h4 className="font-display font-bold text-text-dark text-base">{t("Medication Dashboard")}</h4>
+                        <p className="text-xs text-text-muted mt-0.5 font-sans">{t("Daily adherence checks & logs")}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
@@ -334,8 +338,8 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                         <Heart className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="font-display font-bold text-text-dark text-base">Preventive Care Engine</h4>
-                        <p className="text-xs text-text-muted mt-0.5 font-sans">ICMR guidelines & screenings</p>
+                        <h4 className="font-display font-bold text-text-dark text-base">{t("Preventive Care Engine")}</h4>
+                        <p className="text-xs text-text-muted mt-0.5 font-sans">{t("ICMR guidelines & screenings")}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
@@ -361,33 +365,42 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
               <div className="p-2 bg-pink-50 rounded-lg text-[#F8C8DC] border border-pink-100/50">
                 <Activity className="w-4.5 h-4.5 text-pink-500" />
               </div>
-              Today's Snapshot
+              {t("Today's Snapshot")}
             </h3>
             
             <div className="space-y-3">
               <div className="flex items-center gap-3.5 p-3.5 bg-gray-50/60 rounded-[16px] text-sm hover:bg-gray-50 transition-colors border border-gray-100/50">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 flex-shrink-0 animate-pulse"></span>
-                <span className="text-text-dark font-semibold font-sans">No acute symptoms reported today</span>
+                <span className="text-text-dark font-semibold font-sans">{t("No acute symptoms reported today")}</span>
               </div>
               <div className="flex items-center gap-3.5 p-3.5 bg-gray-50/60 rounded-[16px] text-sm hover:bg-gray-50 transition-colors border border-gray-100/50">
                 <span className="w-2.5 h-2.5 rounded-full bg-indigo-400 flex-shrink-0"></span>
-                <span className="text-text-dark font-semibold font-sans">Iron tablet supplement expected at 8:00 PM</span>
+                <span className="text-text-dark font-semibold font-sans">{t("Iron tablet supplement expected at 8:00 PM")}</span>
               </div>
               <div className="flex items-center gap-3.5 p-3.5 bg-gray-50/60 rounded-[16px] text-sm hover:bg-gray-50 transition-colors border border-gray-100/50">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 flex-shrink-0"></span>
-                <span className="text-text-dark font-semibold font-sans">Vitals synced with village counselor Sunita</span>
+                <span className="text-text-dark font-semibold font-sans">{t("Vitals synced with village counselor Sunita")}</span>
               </div>
             </div>
           </div>
 
           {/* Upcoming Events/Appointments */}
           <div className="bg-white p-6 rounded-[24px] shadow-[0_10px_35px_rgba(0,0,0,0.015)] border border-gray-100/80 space-y-5">
-            <h3 className="font-display font-bold text-lg text-text-dark flex items-center gap-2.5">
-              <div className="p-2 bg-blue-50 rounded-lg text-indigo-500 border border-blue-100/50">
-                <Calendar className="w-4.5 h-4.5 text-indigo-500" />
-              </div>
-              Upcoming Appointments
-            </h3>
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="font-display font-bold text-lg text-text-dark flex items-center gap-2.5">
+                <div className="p-2 bg-blue-50 rounded-lg text-indigo-500 border border-blue-100/50">
+                  <Calendar className="w-4.5 h-4.5 text-indigo-500" />
+                </div>
+                {t("Upcoming Appointments")}
+              </h3>
+              <button
+                onClick={() => setIsApptModalOpen(true)}
+                className="flex items-center gap-1 px-3 py-1.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-100 rounded-full text-xs font-bold font-sans transition-all cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>{t("Book")}</span>
+              </button>
+            </div>
             
             {appointments.length > 0 ? (
               appointments.map((appt) => (
@@ -401,7 +414,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                 </div>
               ))
             ) : (
-              <p className="text-xs text-text-muted py-2 font-sans">No upcoming clinical appointments logged.</p>
+              <p className="text-xs text-text-muted py-2 font-sans">{t("No upcoming clinical appointments logged.")}</p>
             )}
           </div>
 
@@ -411,7 +424,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
               <div className="p-2 bg-purple-50 rounded-lg text-purple-600 border border-purple-100/50">
                 <Brain className="w-4.5 h-4.5 text-purple-500" />
               </div>
-              Recent Milestones
+              {t("Recent Milestones")}
             </h3>
             
             <div className="space-y-4 relative before:absolute before:top-2 before:bottom-2 before:left-[11px] before:w-[1.5px] before:bg-gray-100">
@@ -434,6 +447,12 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
         </div>
 
       </div>
+
+      {/* Appointment Booking Modal overlay */}
+      <AppointmentModal 
+        isOpen={isApptModalOpen} 
+        onClose={() => setIsApptModalOpen(false)} 
+      />
     </div>
   );
 }

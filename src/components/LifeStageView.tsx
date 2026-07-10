@@ -8,6 +8,7 @@ import { Brain, Heart, Sparkles, Check, ChevronRight, BookOpen } from "lucide-re
 import { orchestrator } from "../services/orchestrator";
 import { LifeStageType } from "../types";
 import { motion } from "motion/react";
+import { useTranslation } from "../utils/translation";
 
 const LIFE_STAGES: { name: LifeStageType; range: string; desc: string; icon: string; advice: string }[] = [
   {
@@ -90,6 +91,7 @@ const LIFE_STAGES: { name: LifeStageType; range: string; desc: string; icon: str
 ];
 
 export default function LifeStageView() {
+  const { t } = useTranslation();
   const [activeStage, setActiveStage] = useState<LifeStageType>(orchestrator.getLifeStage());
   const [showConfirm, setShowConfirm] = useState(false);
   const [targetStage, setTargetStage] = useState<LifeStageType | null>(null);
@@ -120,19 +122,19 @@ export default function LifeStageView() {
             {currentDetails.icon}
           </div>
           <div>
-            <span className="text-xs font-display font-bold uppercase tracking-wider text-purple-600">Active Life Stage</span>
-            <h2 className="text-2xl font-display font-bold text-text-dark">{activeStage}</h2>
-            <p className="text-xs text-text-muted mt-0.5 font-sans font-medium">{currentDetails.range}</p>
+            <span className="text-xs font-display font-bold uppercase tracking-wider text-purple-600">{t("Active Life Stage")}</span>
+            <h2 className="text-2xl font-display font-bold text-text-dark">{t(activeStage)}</h2>
+            <p className="text-xs text-text-muted mt-0.5 font-sans font-medium">{t(currentDetails.range)}</p>
           </div>
         </div>
 
         <div className="bg-purple-50/50 px-5 py-4 rounded-2xl border border-purple-100 max-w-md">
           <span className="text-[10px] font-display font-bold uppercase tracking-wider text-purple-700 flex items-center gap-1.5 mb-1">
             <Sparkles className="w-3 h-3 text-purple-500" />
-            Adaptive Guidance
+            {t("Adaptive Guidance")}
           </span>
           <p className="text-xs text-text-dark font-sans leading-relaxed font-medium">
-            "{currentDetails.desc}"
+            "{t(currentDetails.desc)}"
           </p>
         </div>
       </div>
@@ -143,11 +145,10 @@ export default function LifeStageView() {
           <div className="bg-white p-6 md:p-8 rounded-[24px] shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-gray-100">
             <h3 className="font-display font-bold text-lg text-text-dark mb-4 flex items-center gap-2">
               <Brain className="w-5 h-5 text-indigo-600" />
-              Adjust Your Lifelong Journey State
+              {t("Adjust Your Lifelong Journey State")}
             </h3>
             <p className="text-xs text-text-muted mb-6 leading-relaxed">
-              Select your current stage of life. The Saheli Operating System dynamically adjusts the Preventive guidelines, 
-              Care Journey suggestions, and AI advice to matches your exact bio-context.
+              {t("Select your current stage of life. The Saheli Operating System dynamically adjusts the Preventive guidelines, Care Journey suggestions, and AI advice to matches your exact bio-context.")}
             </p>
 
             <div className="space-y-3">
@@ -166,8 +167,8 @@ export default function LifeStageView() {
                     <div className="flex items-center gap-3.5">
                       <span className="text-2xl">{stage.icon}</span>
                       <div>
-                        <h4 className="font-display font-bold text-sm text-text-dark">{stage.name}</h4>
-                        <span className="text-[10px] text-text-muted font-mono block mt-0.5">{stage.range}</span>
+                        <h4 className="font-display font-bold text-sm text-text-dark">{t(stage.name)}</h4>
+                        <span className="text-[10px] text-text-muted font-mono block mt-0.5">{t(stage.range)}</span>
                       </div>
                     </div>
                     {isActive ? (
@@ -189,7 +190,7 @@ export default function LifeStageView() {
           <div className="bg-white p-6 rounded-[24px] shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-gray-100 space-y-4">
             <h3 className="font-display font-bold text-lg text-text-dark flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-pink-500" />
-              Advisor's Guidelines
+              {t("Advisor's Guidelines")}
             </h3>
 
             <div className="p-4 rounded-2xl bg-gradient-to-tr from-pink-500/5 to-purple-500/5 border border-pink-100/50 space-y-3">
@@ -198,28 +199,28 @@ export default function LifeStageView() {
                   AM
                 </div>
                 <div>
-                  <h4 className="font-display font-bold text-xs text-text-dark">Dr. Anjali Mehta</h4>
-                  <p className="text-[9px] text-text-muted font-mono leading-none">Senior Obstetrician & Gynecologist</p>
+                  <h4 className="font-display font-bold text-xs text-text-dark">{t("Dr. Anjali Mehta")}</h4>
+                  <p className="text-[9px] text-text-muted font-mono leading-none">{t("Senior Obstetrician & Gynecologist")}</p>
                 </div>
               </div>
 
               <p className="text-xs text-text-muted font-sans leading-relaxed italic">
-                "{currentDetails.advice}"
+                "{t(currentDetails.advice)}"
               </p>
             </div>
 
             <div className="border-t border-gray-100 pt-4 space-y-3">
               <span className="text-[10px] font-display font-bold uppercase tracking-wider text-text-muted block">
-                Recommended Actions for Priya
+                {t("Recommended Actions for Priya")}
               </span>
               <ul className="space-y-2">
                 <li className="flex items-start gap-2.5 text-xs font-sans text-text-muted font-medium">
                   <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 flex-shrink-0"></div>
-                  Check that all matching vaccines are up to date.
+                  {t("Check that all matching vaccines are up to date.")}
                 </li>
                 <li className="flex items-start gap-2.5 text-xs font-sans text-text-muted font-medium">
                   <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-1.5 flex-shrink-0"></div>
-                  Keep the village healthcare worker (ANM) informed of your stage.
+                  {t("Keep the village healthcare worker (ANM) informed of your stage.")}
                 </li>
               </ul>
             </div>
@@ -231,23 +232,23 @@ export default function LifeStageView() {
       {showConfirm && targetStage && (
         <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-fade-in">
           <div className="bg-white p-6 rounded-3xl max-w-md w-full shadow-2xl border border-gray-100 space-y-4">
-            <h3 className="font-display font-bold text-lg text-text-dark">Confirm Life Stage Change?</h3>
+            <h3 className="font-display font-bold text-lg text-text-dark">{t("Confirm Life Stage Change?")}</h3>
             <p className="text-xs text-text-muted leading-relaxed font-sans">
-              Are you sure you want to transition your active life stage to <span className="font-bold text-purple-600">"{targetStage}"</span>? 
-              This will re-calculate your dashboard alerts, clinical recommendations, and care timelines dynamically.
+              {t("Are you sure you want to transition your active life stage to ")} <span className="font-bold text-purple-600">"{t(targetStage)}"</span>? 
+              {t("This will re-calculate your dashboard alerts, clinical recommendations, and care timelines dynamically.")}
             </p>
             <div className="flex gap-3 justify-end pt-2">
               <button
                 onClick={() => { setShowConfirm(false); setTargetStage(null); }}
                 className="px-4 py-2 text-xs font-display font-bold hover:bg-gray-50 rounded-xl transition-colors cursor-pointer text-text-muted"
               >
-                Cancel
+                {t("Cancel")}
               </button>
               <button
                 onClick={handleConfirmChange}
                 className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl text-xs font-display font-bold shadow-md hover:opacity-95 transition-all cursor-pointer"
               >
-                Yes, Align My Care
+                {t("Yes, Align My Care")}
               </button>
             </div>
           </div>

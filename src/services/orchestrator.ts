@@ -634,7 +634,7 @@ export class OrchestratorService {
         const savedUser = JSON.parse(savedUserStr);
         this.currentUserId = savedUser.id;
       } catch (e) {
-        console.error("Failed to parse saved current user:", e);
+        console.warn("Failed to parse saved current user:", e);
       }
     }
 
@@ -1015,7 +1015,7 @@ export class OrchestratorService {
       try {
         callback(event);
       } catch (err) {
-        console.error(`Error in subscriber for event ${type}:`, err);
+        console.warn(`Error in subscriber for event ${type}:`, err);
       }
     });
 
@@ -1024,7 +1024,7 @@ export class OrchestratorService {
       try {
         callback(event);
       } catch (err) {
-        console.error(`Error in global subscriber:`, err);
+        console.warn(`Error in global subscriber:`, err);
       }
     });
   }
@@ -2350,6 +2350,10 @@ export class OrchestratorService {
     });
 
     this.publish("search_index_updated", this.searchIndex);
+  }
+
+  public updateLanguage(lang: string) {
+    this.publish("profile_updated", { preferredLanguage: lang });
   }
 
   public resetToDefault() {

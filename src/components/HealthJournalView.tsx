@@ -8,8 +8,10 @@ import { BookOpen, Sparkles, Mic, Image as ImageIcon, Check, History, Lock, Mess
 import { orchestrator } from "../services/orchestrator";
 import { JournalEntry } from "../types";
 import { motion, AnimatePresence } from "motion/react";
+import { useTranslation } from "../utils/translation";
 
 export default function HealthJournalView() {
+  const { t } = useTranslation();
   const [entries, setEntries] = useState<JournalEntry[]>(orchestrator.getJournalEntries());
   const [text, setText] = useState("");
   const [hasVoice, setHasVoice] = useState(false);
@@ -83,10 +85,9 @@ export default function HealthJournalView() {
             <Lock className="w-6 h-6 text-emerald-600" />
           </div>
           <div>
-            <h2 className="text-xl md:text-2xl font-display font-bold text-text-dark">Personal Health Journal</h2>
+            <h2 className="text-xl md:text-2xl font-display font-bold text-text-dark">{t("Personal Health Journal")}</h2>
             <p className="text-text-muted text-sm mt-1 max-w-2xl leading-relaxed">
-              Priya, this journal is your private sanctuary. Every entry is encrypted and can only be decrypted 
-              by you. Speak or write about your energy, local meals, or household tasks.
+              {t("Priya, this journal is your private sanctuary. Every entry is encrypted and can only be decrypted by you. Speak or write about your energy, local meals, or household tasks.")}
             </p>
           </div>
         </div>
@@ -98,14 +99,14 @@ export default function HealthJournalView() {
           <div className="bg-white p-6 md:p-8 rounded-[24px] shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-gray-100 space-y-5">
             <h3 className="font-display font-bold text-lg text-text-dark flex items-center gap-2 pb-3 border-b border-gray-50">
               <BookOpen className="w-5 h-5 text-indigo-500" />
-              Write Your Daily Log
+              {t("Write Your Daily Log")}
             </h3>
 
             <div className="space-y-4">
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Write freely... e.g., feeling proud of walk, local meals, sleeping deeply, or back discomfort..."
+                placeholder={t("Write freely... e.g., feeling proud of walk, local meals, sleeping deeply, or back discomfort...")}
                 rows={5}
                 className="w-full p-4 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent text-sm bg-gray-50/30 transition-all font-sans"
               />
@@ -125,7 +126,7 @@ export default function HealthJournalView() {
                     }`}
                   >
                     <Mic className="w-4 h-4" />
-                    {isRecording ? "Recording..." : hasVoice ? "✓ Voice Logged" : "Record Voice Note"}
+                    {isRecording ? t("Recording...") : hasVoice ? t("✓ Voice Logged") : t("Record Voice Note")}
                   </button>
 
                   {/* Photo Button */}
@@ -140,7 +141,7 @@ export default function HealthJournalView() {
                     }`}
                   >
                     <ImageIcon className="w-4 h-4" />
-                    {isPhotoUploading ? "Uploading..." : hasPhoto ? "✓ Photo Added" : "Attach Photo"}
+                    {isPhotoUploading ? t("Uploading...") : hasPhoto ? t("✓ Photo Added") : t("Attach Photo")}
                   </button>
                 </div>
 
@@ -156,12 +157,12 @@ export default function HealthJournalView() {
                   {isSubmitting ? (
                     <>
                       <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
-                      Encrypting...
+                      {t("Encrypting...")}
                     </>
                   ) : (
                     <>
                       <Lock className="w-3.5 h-3.5" />
-                      Save Private Entry
+                      {t("Save Private Entry")}
                     </>
                   )}
                 </button>
@@ -181,10 +182,9 @@ export default function HealthJournalView() {
                   <Check className="w-5 h-5 stroke-[3]" />
                 </div>
                 <div>
-                  <h4 className="font-display font-bold text-emerald-800 text-base">Entry Encrypted & Stored</h4>
+                  <h4 className="font-display font-bold text-emerald-800 text-base">{t("Entry Encrypted & Stored")}</h4>
                   <p className="text-emerald-700/90 text-xs font-sans mt-0.5 leading-relaxed">
-                    Your journal was saved to your secure dossier. The central health intelligence has processed 
-                    the contents and updated any associated health goals dynamically.
+                    {t("Your journal was saved to your secure dossier. The central health intelligence has processed the contents and updated any associated health goals dynamically.")}
                   </p>
                 </div>
               </motion.div>
@@ -197,7 +197,7 @@ export default function HealthJournalView() {
           <div className="bg-white p-6 rounded-[24px] shadow-[0_4px_25px_rgba(0,0,0,0.01)] border border-gray-100 space-y-4">
             <h3 className="font-display font-bold text-lg text-text-dark flex items-center gap-2">
               <History className="w-5 h-5 text-indigo-500" />
-              Journal Archives
+              {t("Journal Archives")}
             </h3>
 
             <div className="space-y-4 max-h-120 overflow-y-auto pr-1">
@@ -211,12 +211,12 @@ export default function HealthJournalView() {
                       <div className="flex gap-2">
                         {ent.hasVoiceNote && (
                           <span className="text-[9px] bg-rose-50 text-rose-600 px-2 py-0.5 rounded-full border border-rose-100 font-bold font-display">
-                            Voice Note
+                            {t("Voice Note")}
                           </span>
                         )}
                         {ent.hasPhoto && (
                           <span className="text-[9px] bg-pink-50 text-pink-600 px-2 py-0.5 rounded-full border border-pink-100 font-bold font-display">
-                            Photo Attachment
+                            {t("Photo Attachment")}
                           </span>
                         )}
                       </div>
@@ -227,7 +227,7 @@ export default function HealthJournalView() {
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-text-muted text-center py-4 font-sans">Your private journal is currently empty.</p>
+                <p className="text-xs text-text-muted text-center py-4 font-sans">{t("Your private journal is currently empty.")}</p>
               )}
             </div>
           </div>

@@ -23,12 +23,16 @@ import {
 } from "lucide-react";
 import { orchestrator } from "../services/orchestrator";
 import { DoctorCompanionState, MedicalRecord, Medication, Appointment } from "../types";
+import { useTranslation } from "../utils/translation";
+import AppointmentModal from "./AppointmentModal";
 
 export default function DoctorCompanionView() {
+  const { t } = useTranslation();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [medicalRecords, setMedicalRecords] = useState<MedicalRecord[]>([]);
   const [medications, setMedications] = useState<Medication[]>([]);
   const [companion, setCompanion] = useState<DoctorCompanionState | null>(null);
+  const [isApptModalOpen, setIsApptModalOpen] = useState(false);
 
   // Edit states for Pre-Appointment Prep
   const [newConcern, setNewConcern] = useState("");
@@ -146,10 +150,10 @@ export default function DoctorCompanionView() {
         <div>
           <h1 className="text-3xl font-display font-bold text-text-dark tracking-tight leading-tight flex items-center gap-2.5">
             <Stethoscope className="w-8 h-8 text-indigo-600" />
-            Doctor Companion
+            {t("Doctor Companion")}
           </h1>
           <p className="text-text-muted mt-1 text-sm font-sans">
-            Prepare clinical brief summaries before your appointment and process prescriptions automatically afterwards.
+            {t("Prepare clinical brief summaries before your appointment and process prescriptions automatically afterwards.")}
           </p>
         </div>
         <button
@@ -157,7 +161,7 @@ export default function DoctorCompanionView() {
           className="flex items-center gap-2 px-5 py-2.5 border border-gray-200 bg-white text-text-dark font-display font-bold rounded-full shadow-sm hover:bg-gray-50 transition-all cursor-pointer text-xs"
         >
           <Printer className="w-4.5 h-4.5" />
-          <span>Print Pre-Visit Brief</span>
+          <span>{t("Print Pre-Visit Brief")}</span>
         </button>
       </div>
 
@@ -173,9 +177,9 @@ export default function DoctorCompanionView() {
               <div className="pb-4 border-b border-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-mono">
-                    Clinic Briefing Guide
+                    {t("Clinic Briefing Guide")}
                   </span>
-                  <h3 className="font-display font-bold text-text-dark text-lg mt-1">Pre-Appointment Clinical Prep</h3>
+                  <h3 className="font-display font-bold text-text-dark text-lg mt-1">{t("Pre-Appointment Clinical Prep")}</h3>
                 </div>
                 <div className="flex items-center gap-1.5 text-xs text-text-muted font-mono font-bold">
                   <Calendar className="w-4 h-4 text-[#E05B7C]" />
@@ -187,26 +191,26 @@ export default function DoctorCompanionView() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4 text-xs font-sans">
                   <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                    <span className="text-[10px] text-text-muted font-bold block uppercase tracking-wider">Doctor Specialist</span>
+                    <span className="text-[10px] text-text-muted font-bold block uppercase tracking-wider">{t("Doctor Specialist")}</span>
                     <strong className="text-text-dark mt-0.5 block">{activeAppt.doctorName}</strong>
                   </div>
                   <div className="bg-gray-50 p-3 rounded-xl border border-gray-100">
-                    <span className="text-[10px] text-text-muted font-bold block uppercase tracking-wider">Purpose of Visit</span>
+                    <span className="text-[10px] text-text-muted font-bold block uppercase tracking-wider">{t("Purpose of Visit")}</span>
                     <strong className="text-text-dark mt-0.5 block truncate">{activeAppt.purpose}</strong>
                   </div>
                 </div>
 
                 {/* 1. Chief Complaint & Summary */}
                 <div className="space-y-1.5 font-sans">
-                  <label className="text-[10px] text-text-dark font-bold uppercase tracking-wider block">1. Primary Consultation Goal (Chief Complaint)</label>
+                  <label className="text-[10px] text-text-dark font-bold uppercase tracking-wider block">{t("1. Primary Consultation Goal (Chief Complaint)")}</label>
                   <p className="p-3 bg-indigo-50/20 text-indigo-900 border border-indigo-100/30 rounded-xl text-xs font-semibold">
-                    {companion?.chiefComplaint || "Plan for healthy second pregnancy."}
+                    {companion?.chiefComplaint || t("Plan for healthy second pregnancy.")}
                   </p>
                 </div>
 
                 {/* 2. Specific Symptoms & Concerns */}
                 <div className="space-y-2.5 font-sans">
-                  <label className="text-[10px] text-text-dark font-bold uppercase tracking-wider block">2. Tracked Symptoms & Personal Concerns</label>
+                  <label className="text-[10px] text-text-dark font-bold uppercase tracking-wider block">{t("2. Tracked Symptoms & Personal Concerns")}</label>
                   <ul className="space-y-1.5 text-xs">
                     {companion?.concerns.map((con, index) => (
                       <li key={index} className="flex items-center justify-between bg-gray-50 p-2.5 rounded-xl border border-gray-100">
@@ -228,7 +232,7 @@ export default function DoctorCompanionView() {
                   <div className="flex gap-2 print:hidden">
                     <input
                       type="text"
-                      placeholder="e.g. Back stiffness after 3 hours of sitting"
+                      placeholder={t("e.g. Back stiffness after 3 hours of sitting")}
                       value={newConcern}
                       onChange={(e) => setNewConcern(e.target.value)}
                       className="flex-1 px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-sans text-text-dark focus:outline-none focus:border-indigo-500"
@@ -244,7 +248,7 @@ export default function DoctorCompanionView() {
 
                 {/* 3. Questions to Ask Gynaecologist */}
                 <div className="space-y-2.5 font-sans">
-                  <label className="text-[10px] text-text-dark font-bold uppercase tracking-wider block">3. Structured Questions for Doctor</label>
+                  <label className="text-[10px] text-text-dark font-bold uppercase tracking-wider block">{t("3. Structured Questions for Doctor")}</label>
                   <ul className="space-y-1.5 text-xs">
                     {companion?.questionsToAsk.map((q, index) => (
                       <li key={index} className="flex items-center justify-between bg-gray-50 p-2.5 rounded-xl border border-gray-100">
@@ -266,7 +270,7 @@ export default function DoctorCompanionView() {
                   <div className="flex gap-2 print:hidden">
                     <input
                       type="text"
-                      placeholder="e.g. Can I take standard back-pain ointments if pregnant?"
+                      placeholder={t("e.g. Can I take standard back-pain ointments if pregnant?")}
                       value={newQuestion}
                       onChange={(e) => setNewQuestion(e.target.value)}
                       className="flex-1 px-3.5 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-sans text-text-dark focus:outline-none focus:border-indigo-500"
@@ -282,7 +286,7 @@ export default function DoctorCompanionView() {
 
                 {/* 4. Active Medications list */}
                 <div className="space-y-2 font-sans">
-                  <label className="text-[10px] text-text-dark font-bold uppercase tracking-wider block">4. Current Active Medication Adherence</label>
+                  <label className="text-[10px] text-text-dark font-bold uppercase tracking-wider block">{t("4. Current Active Medication Adherence")}</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                     {medications.filter(m => m.status === "Active").map(med => (
                       <div key={med.id} className="bg-emerald-50/40 p-2.5 rounded-xl border border-emerald-100/30 flex items-center gap-2">
@@ -295,7 +299,7 @@ export default function DoctorCompanionView() {
 
                 {/* 5. Select Records to Share */}
                 <div className="space-y-2 font-sans print:hidden">
-                  <label className="text-[10px] text-text-dark font-bold uppercase tracking-wider block">5. Select Medical Records for consultation</label>
+                  <label className="text-[10px] text-text-dark font-bold uppercase tracking-wider block">{t("5. Select Medical Records for consultation")}</label>
                   <div className="space-y-1.5">
                     {medicalRecords.map(rec => {
                       const isSelected = companion?.selectedReportIds.includes(rec.id);
@@ -333,11 +337,11 @@ export default function DoctorCompanionView() {
               
               <div>
                 <span className="text-[10px] text-pink-600 font-bold bg-pink-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-mono">
-                  Post-Visit Intelligence
+                  {t("Post-Visit Intelligence")}
                 </span>
-                <h3 className="font-display font-bold text-text-dark text-lg mt-1">Prescription & Advice Extraction</h3>
+                <h3 className="font-display font-bold text-text-dark text-lg mt-1">{t("Prescription & Advice Extraction")}</h3>
                 <p className="text-text-muted mt-0.5 text-xs font-sans">
-                  Add details from your doctor's visit. Saheli will automatically extract medicines & schedule follow-ups.
+                  {t("Add details from your doctor's visit. Saheli will automatically extract medicines & schedule follow-ups.")}
                 </p>
               </div>
 
@@ -345,7 +349,7 @@ export default function DoctorCompanionView() {
                 <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-xl flex items-center gap-3 animate-scale-in">
                   <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />
                   <div className="text-xs font-sans text-emerald-800">
-                    <span className="font-bold block text-emerald-900">Success! AI Care Orchestration complete.</span>
+                    <span className="font-bold block text-emerald-900">{t("Success! AI Care Orchestration complete.")}</span>
                     <span>Medicines added to Dashboard, Lifelong Health Brain updated, and Care Timeline sync'd.</span>
                   </div>
                 </div>
@@ -356,31 +360,31 @@ export default function DoctorCompanionView() {
                 {/* 1. Prescription Text Input */}
                 <div className="space-y-1.5 font-sans">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-text-dark uppercase tracking-wider block">Paste Prescription / Medicines *</label>
+                    <label className="text-xs font-bold text-text-dark uppercase tracking-wider block">{t("Paste Prescription / Medicines *")}</label>
                     <span className="text-[9px] font-bold text-indigo-500 flex items-center gap-0.5">
                       <Sparkles className="w-3 h-3" />
-                      AI Extractor Active
+                      {t("AI Extractor Active")}
                     </span>
                   </div>
                   <textarea
                     rows={3}
-                    placeholder="e.g. Paracetamol 650mg once daily for pain, Calcium tablet daily morning."
+                    placeholder={t("e.g. Paracetamol 650mg once daily for pain, Calcium tablet daily morning.")}
                     value={prescriptionText}
                     onChange={(e) => setPrescriptionText(e.target.value)}
                     required
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 text-xs font-sans text-text-dark"
                   ></textarea>
                   <p className="text-[10px] text-text-muted italic leading-relaxed">
-                    Saheli parses this text to find words like 'Calcium' or 'Paracetamol', automatically schedules check-ins, and places them onto your Medication Dashboard.
+                    {t("Saheli parses this text to find words like 'Calcium' or 'Paracetamol', automatically schedules check-ins, and places them onto your Medication Dashboard.")}
                   </p>
                 </div>
 
                 {/* 2. Doctor instructions */}
                 <div className="space-y-1.5 font-sans">
-                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block">General Doctor Advice / Instructions</label>
+                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block">{t("General Doctor Advice / Instructions")}</label>
                   <input
                     type="text"
-                    placeholder="e.g. Avoid heavy lifting in fields, sleep with leg elevated."
+                    placeholder={t("e.g. Avoid heavy lifting in fields, sleep with leg elevated.")}
                     value={doctorInstructions}
                     onChange={(e) => setDoctorInstructions(e.target.value)}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 text-xs font-sans text-text-dark"
@@ -390,7 +394,7 @@ export default function DoctorCompanionView() {
                 {/* 3. Follow up date */}
                 <div className="grid grid-cols-2 gap-4 font-sans">
                   <div>
-                    <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1">Follow-up Date</label>
+                    <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1">{t("Follow-up Date")}</label>
                     <input
                       type="date"
                       value={followUpDate}
@@ -401,11 +405,11 @@ export default function DoctorCompanionView() {
                   
                   {/* Order medical tests */}
                   <div>
-                    <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1">Ordered Test</label>
+                    <label className="text-xs font-bold text-text-dark uppercase tracking-wider block mb-1">{t("Ordered Test")}</label>
                     <div className="flex gap-1.5">
                       <input
                         type="text"
-                        placeholder="e.g. CBC test, Scan"
+                        placeholder={t("e.g. CBC test, Scan")}
                         value={newTestOrdered}
                         onChange={(e) => setNewTestOrdered(e.target.value)}
                         className="flex-1 px-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 text-xs font-sans text-text-dark"
@@ -435,10 +439,10 @@ export default function DoctorCompanionView() {
 
                 {/* 4. Consultation Notes */}
                 <div className="space-y-1.5 font-sans">
-                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block">Additional Visit Notes</label>
+                  <label className="text-xs font-bold text-text-dark uppercase tracking-wider block">{t("Additional Visit Notes")}</label>
                   <textarea
                     rows={2}
-                    placeholder="e.g. Sunita accompanied me. The doctor was very reassuring and advised that planning a second pregnancy in 6 months is safe."
+                    placeholder={t("e.g. Sunita accompanied me. The doctor was very reassuring and advised that planning a second pregnancy in 6 months is safe.")}
                     value={visitNotes}
                     onChange={(e) => setVisitNotes(e.target.value)}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 text-xs font-sans text-text-dark"
@@ -449,7 +453,7 @@ export default function DoctorCompanionView() {
                 <div className="p-3 bg-rose-50 rounded-xl border border-rose-100 flex gap-2 items-start text-[10px] font-sans text-rose-800 leading-normal">
                   <AlertTriangle className="w-4.5 h-4.5 text-rose-500 shrink-0 mt-0.5" />
                   <span className="font-semibold">
-                    Never modify, stop, or adjust prescription doses without consulting Dr. Anjali Mehta first. For educational support only.
+                    {t("Never modify, stop, or adjust prescription doses without consulting Dr. Anjali Mehta first. For educational support only.")}
                   </span>
                 </div>
 
@@ -458,7 +462,7 @@ export default function DoctorCompanionView() {
                   className="w-full py-3.5 bg-gray-900 hover:bg-black text-white rounded-full font-display font-bold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Upload className="w-4.5 h-4.5 text-white/95" />
-                  <span>Log Visit & Sync Health Operating System</span>
+                  <span>{t("Log Visit & Sync Health Operating System")}</span>
                 </button>
 
               </form>
@@ -468,12 +472,26 @@ export default function DoctorCompanionView() {
 
         </div>
       ) : (
-        <div className="bg-white p-12 rounded-[24px] border border-gray-100 text-center text-text-muted">
-          <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-sm font-sans font-medium">No active scheduled appointments found.</p>
-          <p className="text-xs mt-1">Please schedule a follow-up appointment in your dashboard first!</p>
+        <div className="bg-white p-12 rounded-[24px] border border-gray-100 text-center text-text-muted space-y-4">
+          <Calendar className="w-12 h-12 text-gray-300 mx-auto" />
+          <div>
+            <p className="text-sm font-sans font-medium">{t("No active scheduled appointments found.")}</p>
+            <p className="text-xs mt-1">{t("Please schedule a follow-up appointment to start preparing your pre-visit brief!")}</p>
+          </div>
+          <button
+            onClick={() => setIsApptModalOpen(true)}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-display font-bold text-xs rounded-full shadow-md hover:bg-indigo-700 transition-all cursor-pointer border border-indigo-500"
+          >
+            <Plus className="w-4 h-4" />
+            <span>{t("Book Appointment Now")}</span>
+          </button>
         </div>
       )}
+
+      <AppointmentModal 
+        isOpen={isApptModalOpen} 
+        onClose={() => setIsApptModalOpen(false)} 
+      />
 
     </div>
   );
