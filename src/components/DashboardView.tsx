@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from "react";
+import { motion } from "motion/react";
 import { 
   Heart, 
   Calendar, 
@@ -134,9 +135,11 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
             ].map((tab) => {
               const isActive = activeCompanionTab === tab.id;
               return (
-                <button
+                <motion.button
                   key={tab.id}
                   onClick={() => setActiveCompanionTab(tab.id)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-display font-bold transition-all whitespace-nowrap cursor-pointer ${
                     isActive
                       ? "bg-gradient-to-r from-[#A7D8F2] via-[#F8C8DC] to-[#D8C4F1] text-text-dark border-transparent shadow-sm"
@@ -145,7 +148,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                 >
                   <span className="text-sm">{tab.icon}</span>
                   <span>{tab.label}</span>
-                </button>
+                </motion.button>
               );
             })}
           </div>
@@ -157,10 +160,12 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   {/* QA 1 */}
-                  <button
+                  <motion.button
                     id="qa-update-symptom"
                     onClick={onOpenSymptomModal}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#F8C8DC]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:-translate-y-0.5 active:scale-98 transition-all duration-300 text-left group cursor-pointer"
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#F8C8DC]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-[#F8C8DC]/30 to-[#F8C8DC]/10 text-pink-600 border border-[#F8C8DC]/50">
@@ -172,13 +177,15 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </motion.button>
 
                   {/* QA 2 */}
-                  <button
+                  <motion.button
                     id="qa-start-interview"
                     onClick={() => onNavigate("AI Health Conversation")}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#A7D8F2]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:-translate-y-0.5 active:scale-98 transition-all duration-300 text-left group cursor-pointer"
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#A7D8F2]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-[#A7D8F2]/30 to-[#A7D8F2]/10 text-blue-600 border border-[#A7D8F2]/50">
@@ -190,13 +197,15 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </motion.button>
 
                   {/* QA 3 */}
-                  <button
+                  <motion.button
                     id="qa-view-brain"
                     onClick={() => onNavigate("Personal Health Brain")}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:-translate-y-0.5 active:scale-98 transition-all duration-300 text-left group cursor-pointer"
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-[#D8C4F1]/30 to-[#D8C4F1]/10 text-purple-600 border border-[#D8C4F1]/50">
@@ -208,13 +217,15 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </motion.button>
 
                   {/* QA 4 */}
-                  <button
+                  <motion.button
                     id="qa-view-timeline"
                     onClick={() => onNavigate("Care Journey Timeline")}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#A7D8F2]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:-translate-y-0.5 active:scale-98 transition-all duration-300 text-left group cursor-pointer"
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-[#A7D8F2]/30 to-[#A7D8F2]/10 text-indigo-600 border border-[#A7D8F2]/50">
@@ -226,13 +237,15 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </motion.button>
 
                   {/* QA 5: Medical Records */}
-                  <button
+                  <motion.button
                     id="qa-medical-records"
                     onClick={() => onNavigate("Medical Records")}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-indigo-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:-translate-y-0.5 active:scale-98 transition-all duration-300 text-left group cursor-pointer"
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-indigo-50 to-indigo-100/50 text-indigo-600 border border-indigo-100">
@@ -244,13 +257,15 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </motion.button>
 
                   {/* QA 6: Lab Intelligence */}
-                  <button
+                  <motion.button
                     id="qa-lab-intelligence"
                     onClick={() => onNavigate("Lab Intelligence")}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-blue-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:-translate-y-0.5 active:scale-98 transition-all duration-300 text-left group cursor-pointer"
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-blue-50 to-blue-100/50 text-blue-600 border border-blue-100">
@@ -262,13 +277,15 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </motion.button>
 
                   {/* QA 7: Doctor Companion */}
-                  <button
+                  <motion.button
                     id="qa-doctor-companion"
                     onClick={() => onNavigate("Doctor Companion")}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-pink-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:-translate-y-0.5 active:scale-98 transition-all duration-300 text-left group cursor-pointer"
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-pink-50 to-pink-100/50 text-pink-600 border border-pink-100">
@@ -280,13 +297,15 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </motion.button>
 
                   {/* QA 8: Medication Dashboard */}
-                  <button
+                  <motion.button
                     id="qa-medication-dashboard"
                     onClick={() => onNavigate("Medication Dashboard")}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#E05B7C]/40 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:-translate-y-0.5 active:scale-98 transition-all duration-300 text-left group cursor-pointer"
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-pink-50 to-[#E05B7C]/10 text-[#E05B7C] border border-[#E05B7C]/20">
@@ -298,13 +317,15 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </motion.button>
 
                   {/* QA 9: Preventive Care */}
-                  <button
+                  <motion.button
                     id="qa-preventive-care"
                     onClick={() => onNavigate("Preventive Care")}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:-translate-y-0.5 active:scale-98 transition-all duration-300 text-left group cursor-pointer"
+                    whileHover={{ scale: 1.02, y: -4 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-purple-50 to-[#D8C4F1]/20 text-purple-600 border border-purple-100">
@@ -316,7 +337,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-text-muted group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </motion.button>
                 </div>
               </div>
             )}

@@ -43,6 +43,20 @@ import PreventiveCareView from "./components/PreventiveCareView";
 import { orchestrator } from "./services/orchestrator";
 import { OrchestratorEvent } from "./types";
 
+const tabBackgrounds: Record<string, string> = {
+  "Dashboard": "bg-[#FFF5F6]", // Pastel Rose
+  "Personal Health Brain": "bg-[#F3F0FF]", // Pastel Lavender
+  "AI Health Conversation": "bg-[#E6F4EA]", // Pastel Mint
+  "Care Journey Timeline": "bg-[#EBF8FF]", // Pastel Sky Blue
+  "Medical Records": "bg-[#FEFCBF]", // Pastel Pale Yellow
+  "Lab Intelligence": "bg-[#FFF0F6]", // Pastel Blossom Pink
+  "Doctor Companion": "bg-[#EBFDF9]", // Pastel Teal
+  "Medication Dashboard": "bg-[#FFF9DB]", // Pastel Buttercup
+  "Preventive Care": "bg-[#FFF5F7]", // Pastel Coral
+  "Orchestrator Logs": "bg-[#F1F3F5]", // Pastel Slate Grey
+  "Settings": "bg-[#F8F9FA]" // Pastel Neutral
+};
+
 export default function App() {
   // Navigation states
   const [isOnboarded, setIsOnboarded] = useState(() => {
@@ -120,11 +134,16 @@ export default function App() {
     <div className="min-h-screen bg-bg-calm flex text-text-dark font-sans selection:bg-pastel-pink/30">
       
       {/* 1. Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-gray-100 flex-shrink-0 relative">
-        {/* Brand / Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-gray-50 gap-2.5">
-          <SaheliAppIconSVG className="w-8 h-8" />
-          <span className="font-display font-bold text-lg text-text-dark tracking-wide">Saheli</span>
+      <aside className="hidden lg:flex flex-col w-72 bg-white border-r border-gray-100 flex-shrink-0 relative">
+        {/* Brand / Logo - Logo in top left with Name and Tagline beside it */}
+        <div className="py-5 px-6 border-b border-gray-100 flex flex-col justify-center">
+          <div className="flex items-center gap-3">
+            <SaheliAppIconSVG className="w-10 h-10 flex-shrink-0" />
+            <div className="flex flex-col min-w-0">
+              <span className="font-display font-black text-xl text-text-dark leading-none tracking-wide">Saheli</span>
+              <span className="text-[10px] text-pink-600 font-bold leading-tight mt-1 whitespace-nowrap">आपकी और आपके अपनों की</span>
+            </div>
+          </div>
         </div>
 
         {/* Navigation items */}
@@ -133,9 +152,11 @@ export default function App() {
             const Icon = item.icon;
             const isActive = activeTab === item.name;
             return (
-              <button
+              <motion.button
                 key={item.name}
                 onClick={() => setActiveTab(item.name)}
+                whileHover={{ scale: 1.02, x: 4 }}
+                whileTap={{ scale: 0.98 }}                
                 className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-display font-semibold rounded-xl transition-all cursor-pointer ${
                   isActive 
                     ? "bg-pastel-blue text-text-dark shadow-xs border border-blue-200/50" 
@@ -144,20 +165,22 @@ export default function App() {
               >
                 <Icon className={`w-4.5 h-4.5 ${isActive ? "text-text-dark" : "text-text-muted"}`} />
                 {item.name}
-              </button>
+              </motion.button>
             );
           })}
         </nav>
 
         {/* Sidebar Footer */}
         <div className="p-4 border-t border-gray-50 bg-gray-50/50">
-          <button
+          <motion.button
             onClick={handleLogout}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-display font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             Logout Profile
-          </button>
+          </motion.button>
         </div>
       </aside>
 
@@ -179,14 +202,17 @@ export default function App() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              className="fixed inset-y-0 left-0 w-64 bg-white z-50 flex flex-col lg:hidden shadow-xl"
+              className="fixed inset-y-0 left-0 w-72 bg-white z-50 flex flex-col lg:hidden shadow-xl"
             >
-              <div className="h-16 flex items-center justify-between px-6 border-b border-gray-50">
+              <div className="py-5 px-5 flex items-center justify-between border-b border-gray-100">
                 <div className="flex items-center gap-2.5">
-                  <SaheliAppIconSVG className="w-8 h-8" />
-                  <span className="font-display font-bold text-lg text-text-dark">Saheli</span>
+                  <SaheliAppIconSVG className="w-9 h-9 flex-shrink-0" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-display font-black text-lg text-text-dark leading-none tracking-wide">Saheli</span>
+                    <span className="text-[9px] text-pink-600 font-bold leading-tight mt-0.5 whitespace-nowrap">आपकी और आपके अपनों की</span>
+                  </div>
                 </div>
-                <button onClick={() => setIsMobileSidebarOpen(false)} className="p-1 rounded-lg hover:bg-gray-100 text-gray-500 cursor-pointer">
+                <button onClick={() => setIsMobileSidebarOpen(false)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 cursor-pointer">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -196,9 +222,11 @@ export default function App() {
                   const Icon = item.icon;
                   const isActive = activeTab === item.name;
                   return (
-                    <button
+                    <motion.button
                       key={item.name}
                       onClick={() => { setActiveTab(item.name); setIsMobileSidebarOpen(false); }}
+                      whileHover={{ scale: 1.02, x: 4 }}
+                      whileTap={{ scale: 0.98 }}
                       className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-display font-semibold rounded-xl transition-all cursor-pointer ${
                         isActive 
                           ? "bg-pastel-blue text-text-dark border border-blue-200/50" 
@@ -207,42 +235,53 @@ export default function App() {
                     >
                       <Icon className="w-4.5 h-4.5" />
                       {item.name}
-                    </button>
+                    </motion.button>
                   );
                 })}
               </nav>
 
               <div className="p-4 border-t border-gray-50 bg-gray-50/50">
-                <button
+                <motion.button
                   onClick={handleLogout}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-display font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                   Logout Profile
-                </button>
+                </motion.button>
               </div>
             </motion.aside>
           </>
         )}
       </AnimatePresence>
 
-      {/* 3. Main Workspace Area */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+      {/* 3. Main Workspace Area - Dynamic background transitions for tabs */}
+      <div className={`flex-1 flex flex-col min-w-0 min-h-screen transition-colors duration-700 ease-in-out ${tabBackgrounds[activeTab] || "bg-bg-calm"}`}>
         
         {/* Top Navigation Row */}
-        <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6 z-30 sticky top-0">
+        <header className="h-16 bg-white/70 backdrop-blur-md border-b border-gray-100/50 flex items-center justify-between px-6 z-30 sticky top-0">
           
-          {/* Mobile hamburger toggle */}
-          <div className="flex items-center gap-4">
+          {/* Mobile hamburger toggle & Brand indicator */}
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => setIsMobileSidebarOpen(true)}
-              className="p-2 -ml-2 text-text-muted hover:text-text-dark lg:hidden rounded-lg hover:bg-gray-50 cursor-pointer"
+              className="p-2 -ml-2 text-text-muted hover:text-text-dark lg:hidden rounded-lg hover:bg-gray-100/50 cursor-pointer"
             >
               <Menu className="w-5 h-5" />
             </button>
 
+            {/* Mobile-only brand identifier (Logo + Name + Tagline on the top-left for mobile) */}
+            <div className="flex items-center gap-2.5 lg:hidden">
+              <SaheliAppIconSVG className="w-8 h-8 flex-shrink-0" />
+              <div className="flex flex-col">
+                <span className="font-display font-black text-sm text-text-dark leading-none">Saheli</span>
+                <span className="text-[8px] text-pink-600 font-bold leading-tight mt-0.5 whitespace-nowrap">आपकी और आपके अपनों की</span>
+              </div>
+            </div>
+
             {/* Top Bar Search indicator */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-100 text-xs text-text-muted w-64">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-100 text-xs text-text-muted w-64">
               <Search className="w-3.5 h-3.5" />
               <input 
                 type="text" 
