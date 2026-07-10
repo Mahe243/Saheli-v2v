@@ -595,6 +595,7 @@ export class OrchestratorService {
   private allSubscribers: Set<EventSubscriber> = new Set();
   
   // App State
+  public currentUserId: string | null = null;
   private brain: HealthBrain;
   private symptoms: SymptomLog[] = [];
   private timeline: TimelineEvent[];
@@ -626,58 +627,71 @@ export class OrchestratorService {
   private searchIndex: SearchIndex[] = [];
 
   constructor() {
+    // Attempt to restore current user session if stored
+    const savedUserStr = localStorage.getItem("saheli_current_user");
+    if (savedUserStr) {
+      try {
+        const savedUser = JSON.parse(savedUserStr);
+        this.currentUserId = savedUser.id;
+      } catch (e) {
+        console.error("Failed to parse saved current user:", e);
+      }
+    }
+
+    const prefix = this.currentUserId ? `saheli_${this.currentUserId}_` : `saheli_`;
+
     // Load from local storage if available, otherwise seed
-    const savedBrain = localStorage.getItem("saheli_health_brain");
-    const savedTimeline = localStorage.getItem("saheli_timeline");
-    const savedSymptoms = localStorage.getItem("saheli_symptoms");
-    const savedAppointments = localStorage.getItem("saheli_appointments");
-    const savedSummary = localStorage.getItem("saheli_summary");
-    const savedLogs = localStorage.getItem("saheli_logs");
+    const savedBrain = localStorage.getItem(`${prefix}health_brain`);
+    const savedTimeline = localStorage.getItem(`${prefix}timeline`);
+    const savedSymptoms = localStorage.getItem(`${prefix}symptoms`);
+    const savedAppointments = localStorage.getItem(`${prefix}appointments`);
+    const savedSummary = localStorage.getItem(`${prefix}summary`);
+    const savedLogs = localStorage.getItem(`${prefix}logs`);
 
     // Phase 2 Loaders
-    const savedRecords = localStorage.getItem("saheli_medical_records");
-    const savedMedications = localStorage.getItem("saheli_medications");
-    const savedPreventive = localStorage.getItem("saheli_preventive_reminders");
-    const savedDoctorCompanion = localStorage.getItem("saheli_doctor_companion");
+    const savedRecords = localStorage.getItem(`${prefix}medical_records`);
+    const savedMedications = localStorage.getItem(`${prefix}medications`);
+    const savedPreventive = localStorage.getItem(`${prefix}preventive_reminders`);
+    const savedDoctorCompanion = localStorage.getItem(`${prefix}doctor_companion`);
 
     // Phase 3 Loaders
-    const savedLifeStage = localStorage.getItem("saheli_life_stage");
-    const savedEmotionLogs = localStorage.getItem("saheli_emotion_logs");
-    const savedWeeklyCheckIns = localStorage.getItem("saheli_weekly_checkins");
-    const savedJournalEntries = localStorage.getItem("saheli_journal_entries");
-    const savedGoals = localStorage.getItem("saheli_goals");
-    const savedAchievements = localStorage.getItem("saheli_achievements");
+    const savedLifeStage = localStorage.getItem(`${prefix}life_stage`);
+    const savedEmotionLogs = localStorage.getItem(`${prefix}emotion_logs`);
+    const savedWeeklyCheckIns = localStorage.getItem(`${prefix}weekly_checkins`);
+    const savedJournalEntries = localStorage.getItem(`${prefix}journal_entries`);
+    const savedGoals = localStorage.getItem(`${prefix}goals`);
+    const savedAchievements = localStorage.getItem(`${prefix}achievements`);
 
     // Phase 4 Loaders
-    const savedInsights = localStorage.getItem("saheli_health_insights");
-    const savedRecommendations = localStorage.getItem("saheli_recommendations");
-    const savedReviews = localStorage.getItem("saheli_monthly_reviews");
-    const savedIndicators = localStorage.getItem("saheli_health_indicators");
-    const savedMemories = localStorage.getItem("saheli_memory_items");
+    const savedInsights = localStorage.getItem(`${prefix}health_insights`);
+    const savedRecommendations = localStorage.getItem(`${prefix}recommendations`);
+    const savedReviews = localStorage.getItem(`${prefix}monthly_reviews`);
+    const savedIndicators = localStorage.getItem(`${prefix}health_indicators`);
+    const savedMemories = localStorage.getItem(`${prefix}memory_items`);
 
     this.brain = savedBrain ? JSON.parse(savedBrain) : INITIAL_HEALTH_BRAIN;
     this.timeline = savedTimeline ? JSON.parse(savedTimeline) : INITIAL_TIMELINE;
     this.appointments = savedAppointments ? JSON.parse(savedAppointments) : INITIAL_APPOINTMENTS;
     this.summary = savedSummary ? JSON.parse(savedSummary) : INITIAL_SUMMARY;
-    this.symptoms = savedSymptoms ? JSON.parse(savedSymptoms) : [
+    this.symptoms = savedSymptoms ? JSON.parse(savedSymptoms) : (this.currentUserId ? [] : [
       { id: "s1", date: "2026-07-01", name: "Lower Back Discomfort", severity: "Mild", notes: "After fields work" }
-    ];
+    ]);
     this.logs = savedLogs ? JSON.parse(savedLogs) : [
-      { type: "profile_updated", payload: { name: "Priya Devi" }, timestamp: "2026-05-15T10:00:00Z" }
+      { type: "profile_updated", payload: { name: this.brain.profile.name }, timestamp: new Date().toISOString() }
     ];
 
-    this.medicalRecords = savedRecords ? JSON.parse(savedRecords) : INITIAL_RECORDS;
-    this.medications = savedMedications ? JSON.parse(savedMedications) : INITIAL_MEDICATIONS;
-    this.preventive = savedPreventive ? JSON.parse(savedPreventive) : INITIAL_PREVENTIVE;
-    this.doctorCompanion = savedDoctorCompanion ? JSON.parse(savedDoctorCompanion) : INITIAL_DOCTOR_COMPANION;
+    this.medicalRecords = savedRecords ? JSON.parse(savedRecords) : (this.currentUserId ? [] : INITIAL_RECORDS);
+    this.medications = savedMedications ? JSON.parse(savedMedications) : (this.currentUserId ? [] : INITIAL_MEDICATIONS);
+    this.preventive = savedPreventive ? JSON.parse(savedPreventive) : (this.currentUserId ? [] : INITIAL_PREVENTIVE);
+    this.doctorCompanion = savedDoctorCompanion ? JSON.parse(savedDoctorCompanion) : (this.currentUserId ? {} : INITIAL_DOCTOR_COMPANION);
 
     // Phase 3 Initializers
-    this.currentLifeStage = savedLifeStage ? (JSON.parse(savedLifeStage) as LifeStageType) : INITIAL_LIFE_STAGE;
-    this.emotionLogs = savedEmotionLogs ? JSON.parse(savedEmotionLogs) : INITIAL_EMOTION_LOGS;
-    this.weeklyCheckIns = savedWeeklyCheckIns ? JSON.parse(savedWeeklyCheckIns) : INITIAL_WEEKLY_CHECKINS;
-    this.journalEntries = savedJournalEntries ? JSON.parse(savedJournalEntries) : INITIAL_JOURNAL_ENTRIES;
-    this.goals = savedGoals ? JSON.parse(savedGoals) : INITIAL_GOALS;
-    this.achievements = savedAchievements ? JSON.parse(savedAchievements) : INITIAL_ACHIEVEMENTS;
+    this.currentLifeStage = savedLifeStage ? (JSON.parse(savedLifeStage) as LifeStageType) : (this.currentUserId ? "Motherhood" : INITIAL_LIFE_STAGE);
+    this.emotionLogs = savedEmotionLogs ? JSON.parse(savedEmotionLogs) : (this.currentUserId ? [] : INITIAL_EMOTION_LOGS);
+    this.weeklyCheckIns = savedWeeklyCheckIns ? JSON.parse(savedWeeklyCheckIns) : (this.currentUserId ? [] : INITIAL_WEEKLY_CHECKINS);
+    this.journalEntries = savedJournalEntries ? JSON.parse(savedJournalEntries) : (this.currentUserId ? [] : INITIAL_JOURNAL_ENTRIES);
+    this.goals = savedGoals ? JSON.parse(savedGoals) : (this.currentUserId ? [] : INITIAL_GOALS);
+    this.achievements = savedAchievements ? JSON.parse(savedAchievements) : (this.currentUserId ? [] : INITIAL_ACHIEVEMENTS);
 
     // Phase 4 Initializers
     this.knowledgeArticles = SEED_KNOWLEDGE_ARTICLES;
@@ -686,7 +700,7 @@ export class OrchestratorService {
     this.monthlyReviews = savedReviews ? JSON.parse(savedReviews) : [];
     this.healthIndicators = savedIndicators ? JSON.parse(savedIndicators) : [];
     
-    this.memoryItems = savedMemories ? JSON.parse(savedMemories) : [
+    this.memoryItems = savedMemories ? JSON.parse(savedMemories) : (this.currentUserId ? [] : [
       {
         id: "m1",
         category: "appointment",
@@ -727,7 +741,7 @@ export class OrchestratorService {
         transparentReason: "Extracted from lifestyle profile",
         updatedAt: "2026-05-20"
       }
-    ];
+    ]);
 
     // Seed defaults if empty
     if (this.healthIndicators.length === 0) {
@@ -744,38 +758,231 @@ export class OrchestratorService {
 
     // Auto-save setup
     this.subscribeAll((event) => {
-      this.logs.unshift(event);
-      // Keep only last 50 logs for readability
-      if (this.logs.length > 50) this.logs.pop();
+      if (event.type !== "profile_updated") {
+        this.logs.unshift(event);
+        // Keep only last 50 logs for readability
+        if (this.logs.length > 50) this.logs.pop();
+      }
 
-      localStorage.setItem("saheli_health_brain", JSON.stringify(this.brain));
-      localStorage.setItem("saheli_timeline", JSON.stringify(this.timeline));
-      localStorage.setItem("saheli_symptoms", JSON.stringify(this.symptoms));
-      localStorage.setItem("saheli_appointments", JSON.stringify(this.appointments));
-      localStorage.setItem("saheli_summary", JSON.stringify(this.summary));
-      localStorage.setItem("saheli_logs", JSON.stringify(this.logs));
+      const activePrefix = this.currentUserId ? `saheli_${this.currentUserId}_` : `saheli_`;
+
+      localStorage.setItem(`${activePrefix}health_brain`, JSON.stringify(this.brain));
+      localStorage.setItem(`${activePrefix}timeline`, JSON.stringify(this.timeline));
+      localStorage.setItem(`${activePrefix}symptoms`, JSON.stringify(this.symptoms));
+      localStorage.setItem(`${activePrefix}appointments`, JSON.stringify(this.appointments));
+      localStorage.setItem(`${activePrefix}summary`, JSON.stringify(this.summary));
+      localStorage.setItem(`${activePrefix}logs`, JSON.stringify(this.logs));
 
       // Phase 2 Savers
-      localStorage.setItem("saheli_medical_records", JSON.stringify(this.medicalRecords));
-      localStorage.setItem("saheli_medications", JSON.stringify(this.medications));
-      localStorage.setItem("saheli_preventive_reminders", JSON.stringify(this.preventive));
-      localStorage.setItem("saheli_doctor_companion", JSON.stringify(this.doctorCompanion));
+      localStorage.setItem(`${activePrefix}medical_records`, JSON.stringify(this.medicalRecords));
+      localStorage.setItem(`${activePrefix}medications`, JSON.stringify(this.medications));
+      localStorage.setItem(`${activePrefix}preventive_reminders`, JSON.stringify(this.preventive));
+      localStorage.setItem(`${activePrefix}doctor_companion`, JSON.stringify(this.doctorCompanion));
 
       // Phase 3 Savers
-      localStorage.setItem("saheli_life_stage", JSON.stringify(this.currentLifeStage));
-      localStorage.setItem("saheli_emotion_logs", JSON.stringify(this.emotionLogs));
-      localStorage.setItem("saheli_weekly_checkins", JSON.stringify(this.weeklyCheckIns));
-      localStorage.setItem("saheli_journal_entries", JSON.stringify(this.journalEntries));
-      localStorage.setItem("saheli_goals", JSON.stringify(this.goals));
-      localStorage.setItem("saheli_achievements", JSON.stringify(this.achievements));
+      localStorage.setItem(`${activePrefix}life_stage`, JSON.stringify(this.currentLifeStage));
+      localStorage.setItem(`${activePrefix}emotion_logs`, JSON.stringify(this.emotionLogs));
+      localStorage.setItem(`${activePrefix}weekly_checkins`, JSON.stringify(this.weeklyCheckIns));
+      localStorage.setItem(`${activePrefix}journal_entries`, JSON.stringify(this.journalEntries));
+      localStorage.setItem(`${activePrefix}goals`, JSON.stringify(this.goals));
+      localStorage.setItem(`${activePrefix}achievements`, JSON.stringify(this.achievements));
 
       // Phase 4 Savers
-      localStorage.setItem("saheli_health_insights", JSON.stringify(this.healthInsights));
-      localStorage.setItem("saheli_recommendations", JSON.stringify(this.recommendations));
-      localStorage.setItem("saheli_monthly_reviews", JSON.stringify(this.monthlyReviews));
-      localStorage.setItem("saheli_health_indicators", JSON.stringify(this.healthIndicators));
-      localStorage.setItem("saheli_memory_items", JSON.stringify(this.memoryItems));
+      localStorage.setItem(`${activePrefix}health_insights`, JSON.stringify(this.healthInsights));
+      localStorage.setItem(`${activePrefix}recommendations`, JSON.stringify(this.recommendations));
+      localStorage.setItem(`${activePrefix}monthly_reviews`, JSON.stringify(this.monthlyReviews));
+      localStorage.setItem(`${activePrefix}health_indicators`, JSON.stringify(this.healthIndicators));
+      localStorage.setItem(`${activePrefix}memory_items`, JSON.stringify(this.memoryItems));
     });
+  }
+
+  // Multi-User state management methods
+  public loadUserState(userId: string | null) {
+    this.currentUserId = userId;
+    const prefix = userId ? `saheli_${userId}_` : `saheli_`;
+
+    const savedBrain = localStorage.getItem(`${prefix}health_brain`);
+    const savedTimeline = localStorage.getItem(`${prefix}timeline`);
+    const savedSymptoms = localStorage.getItem(`${prefix}symptoms`);
+    const savedAppointments = localStorage.getItem(`${prefix}appointments`);
+    const savedSummary = localStorage.getItem(`${prefix}summary`);
+    const savedLogs = localStorage.getItem(`${prefix}logs`);
+
+    const savedRecords = localStorage.getItem(`${prefix}medical_records`);
+    const savedMedications = localStorage.getItem(`${prefix}medications`);
+    const savedPreventive = localStorage.getItem(`${prefix}preventive_reminders`);
+    const savedDoctorCompanion = localStorage.getItem(`${prefix}doctor_companion`);
+
+    const savedLifeStage = localStorage.getItem(`${prefix}life_stage`);
+    const savedEmotionLogs = localStorage.getItem(`${prefix}emotion_logs`);
+    const savedWeeklyCheckIns = localStorage.getItem(`${prefix}weekly_checkins`);
+    const savedJournalEntries = localStorage.getItem(`${prefix}journal_entries`);
+    const savedGoals = localStorage.getItem(`${prefix}goals`);
+    const savedAchievements = localStorage.getItem(`${prefix}achievements`);
+
+    const savedInsights = localStorage.getItem(`${prefix}health_insights`);
+    const savedRecommendations = localStorage.getItem(`${prefix}recommendations`);
+    const savedReviews = localStorage.getItem(`${prefix}monthly_reviews`);
+    const savedIndicators = localStorage.getItem(`${prefix}health_indicators`);
+    const savedMemories = localStorage.getItem(`${prefix}memory_items`);
+
+    this.brain = savedBrain ? JSON.parse(savedBrain) : INITIAL_HEALTH_BRAIN;
+    this.timeline = savedTimeline ? JSON.parse(savedTimeline) : INITIAL_TIMELINE;
+    this.appointments = savedAppointments ? JSON.parse(savedAppointments) : INITIAL_APPOINTMENTS;
+    this.summary = savedSummary ? JSON.parse(savedSummary) : INITIAL_SUMMARY;
+    this.symptoms = savedSymptoms ? JSON.parse(savedSymptoms) : (this.currentUserId ? [] : [
+      { id: "s1", date: "2026-07-01", name: "Lower Back Discomfort", severity: "Mild", notes: "After fields work" }
+    ]);
+    this.logs = savedLogs ? JSON.parse(savedLogs) : [
+      { type: "profile_updated", payload: { name: this.brain.profile.name }, timestamp: new Date().toISOString() }
+    ];
+
+    this.medicalRecords = savedRecords ? JSON.parse(savedRecords) : (this.currentUserId ? [] : INITIAL_RECORDS);
+    this.medications = savedMedications ? JSON.parse(savedMedications) : (this.currentUserId ? [] : INITIAL_MEDICATIONS);
+    this.preventive = savedPreventive ? JSON.parse(savedPreventive) : (this.currentUserId ? [] : INITIAL_PREVENTIVE);
+    this.doctorCompanion = savedDoctorCompanion ? JSON.parse(savedDoctorCompanion) : (this.currentUserId ? {} : INITIAL_DOCTOR_COMPANION);
+
+    this.currentLifeStage = savedLifeStage ? (JSON.parse(savedLifeStage) as LifeStageType) : (this.currentUserId ? "Motherhood" : INITIAL_LIFE_STAGE);
+    this.emotionLogs = savedEmotionLogs ? JSON.parse(savedEmotionLogs) : (this.currentUserId ? [] : INITIAL_EMOTION_LOGS);
+    this.weeklyCheckIns = savedWeeklyCheckIns ? JSON.parse(savedWeeklyCheckIns) : (this.currentUserId ? [] : INITIAL_WEEKLY_CHECKINS);
+    this.journalEntries = savedJournalEntries ? JSON.parse(savedJournalEntries) : (this.currentUserId ? [] : INITIAL_JOURNAL_ENTRIES);
+    this.goals = savedGoals ? JSON.parse(savedGoals) : (this.currentUserId ? [] : INITIAL_GOALS);
+    this.achievements = savedAchievements ? JSON.parse(savedAchievements) : (this.currentUserId ? [] : INITIAL_ACHIEVEMENTS);
+
+    this.healthInsights = savedInsights ? JSON.parse(savedInsights) : [];
+    this.recommendations = savedRecommendations ? JSON.parse(savedRecommendations) : [];
+    this.monthlyReviews = savedReviews ? JSON.parse(savedReviews) : [];
+    this.healthIndicators = savedIndicators ? JSON.parse(savedIndicators) : [];
+    this.memoryItems = savedMemories ? JSON.parse(savedMemories) : (this.currentUserId ? [] : [
+      {
+        id: "m1",
+        category: "appointment",
+        key: "Preferred Appointment Time",
+        value: "Morning slots (10:00 AM to 12:00 PM)",
+        transparentReason: "Explicitly shared during your conversation on July 5",
+        updatedAt: "2026-07-05"
+      },
+      {
+        id: "m2",
+        category: "language",
+        key: "Preferred Language",
+        value: "Hindi (हिंदी)",
+        transparentReason: "Configured during account setup",
+        updatedAt: "2026-05-15"
+      }
+    ]);
+
+    if (this.healthIndicators.length === 0) {
+      this.recalculateIndicatorsInternal();
+    }
+    if (this.healthInsights.length === 0) {
+      this.generateHealthInsightsInternal();
+    }
+    if (this.monthlyReviews.length === 0) {
+      this.generateMonthlyReviewInternal();
+    }
+    this.refreshRecommendations();
+    this.rebuildSearchIndexInternal();
+
+    this.publish("profile_updated", this.brain.profile);
+  }
+
+  public initializeUserWorkspace(userId: string, fullName: string, preferredLanguage: string) {
+    this.currentUserId = userId;
+    
+    // Create Personal Health Brain
+    const userBrain: HealthBrain = {
+      profile: {
+        name: fullName,
+        age: 28,
+        height: "155 cm",
+        weight: "58 kg",
+        bloodGroup: "O+",
+        emergencyContact: "Emergency Contact (Family) - Not configured"
+      },
+      lifestyle: {
+        exercise: "Moderate (Walking, daily chores)",
+        sleep: "7 hours (Regular sleep schedule)",
+        diet: "Primarily Vegetarian (Rice, lentils, local vegetables)",
+        smoking: "Never",
+        alcohol: "Never"
+      },
+      medicalHistory: {
+        currentConditions: [],
+        previousIllnesses: [],
+        surgeries: [],
+        pregnancyHistory: "None",
+        vaccinations: [],
+        currentMedicines: [],
+        allergies: []
+      },
+      familyHistory: {
+        mother: "Healthy",
+        father: "Healthy",
+        grandparents: "Healthy"
+      },
+      healthGoals: []
+    };
+    
+    // Create Timeline
+    const userTimeline: TimelineEvent[] = [
+      {
+        id: "t_init",
+        date: new Date().toISOString().split("T")[0],
+        category: "Life Events",
+        title: "Joined Saheli",
+        description: `Welcome ${fullName} to Saheli! Your personal isolated health workspace has been successfully initialized.`,
+        notes: "Account set up and fully encrypted."
+      }
+    ];
+    
+    // Create Empty Medical Record
+    const userRecords: MedicalRecord[] = [];
+    
+    // Create AI Memory
+    const userMemories: MemoryItem[] = [
+      {
+        id: "m_init",
+        category: "language",
+        key: "Preferred Language",
+        value: preferredLanguage,
+        transparentReason: "Configured during registration",
+        updatedAt: new Date().toISOString().split("T")[0]
+      }
+    ];
+
+    // Create Dashboard / Summary
+    const userSummary: HealthSummary = {
+      updatedAt: new Date().toISOString().split("T")[0],
+      summaryText: `Welcome to Saheli, ${fullName}. Complete your onboarding and start logging symptoms to generate your health brain summary.`,
+      keyActionItems: ["Complete your first-time onboarding", "Log any active symptoms"]
+    };
+
+    const activePrefix = `saheli_${userId}_`;
+
+    localStorage.setItem(`${activePrefix}health_brain`, JSON.stringify(userBrain));
+    localStorage.setItem(`${activePrefix}timeline`, JSON.stringify(userTimeline));
+    localStorage.setItem(`${activePrefix}medical_records`, JSON.stringify(userRecords));
+    localStorage.setItem(`${activePrefix}memory_items`, JSON.stringify(userMemories));
+    localStorage.setItem(`${activePrefix}summary`, JSON.stringify(userSummary));
+    localStorage.setItem(`${activePrefix}symptoms`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}appointments`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}medications`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}preventive_reminders`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}doctor_companion`, JSON.stringify({}));
+    localStorage.setItem(`${activePrefix}life_stage`, JSON.stringify("Motherhood"));
+    localStorage.setItem(`${activePrefix}emotion_logs`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}weekly_checkins`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}journal_entries`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}goals`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}achievements`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}health_insights`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}recommendations`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}monthly_reviews`, JSON.stringify([]));
+    localStorage.setItem(`${activePrefix}health_indicators`, JSON.stringify([]));
+
+    // Reload state
+    this.loadUserState(userId);
   }
 
   // Pub Sub Implementation
@@ -845,6 +1052,18 @@ export class OrchestratorService {
 
   public getSystemLogs(): OrchestratorEvent[] {
     return this.logs;
+  }
+
+  public updateProfileDetails(profileData: { age?: number; height?: string; weight?: string; bloodGroup?: string; emergencyContact?: string; name?: string }) {
+    if (profileData.name) this.brain.profile.name = profileData.name;
+    if (profileData.age) this.brain.profile.age = profileData.age;
+    if (profileData.height) this.brain.profile.height = profileData.height;
+    if (profileData.weight) this.brain.profile.weight = profileData.weight;
+    if (profileData.bloodGroup) this.brain.profile.bloodGroup = profileData.bloodGroup;
+    if (profileData.emergencyContact) this.brain.profile.emergencyContact = profileData.emergencyContact;
+
+    this.publish("profile_updated", this.brain.profile);
+    this.triggerSummaryRegeneration();
   }
 
   // Phase 2 Getters

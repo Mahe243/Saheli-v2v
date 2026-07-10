@@ -66,6 +66,9 @@ export default function App() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isSymptomModalOpen, setIsSymptomModalOpen] = useState(false);
 
+  // Reactive user profile state
+  const [userProfile, setUserProfile] = useState(() => orchestrator.getHealthBrain().profile);
+
   // Top Nav Notification Bell state
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<OrchestratorEvent[]>([]);
@@ -79,7 +82,14 @@ export default function App() {
       setNotifications(orchestrator.getSystemLogs().slice(0, 5));
     });
 
-    return () => unsub();
+    const unsubProfile = orchestrator.subscribe("profile_updated", () => {
+      setUserProfile(orchestrator.getHealthBrain().profile);
+    });
+
+    return () => {
+      unsub();
+      unsubProfile();
+    };
   }, []);
 
   const handleStartApp = () => {
@@ -89,7 +99,21 @@ export default function App() {
 
   const handleLogout = () => {
     localStorage.removeItem("saheli_onboarded");
+    localStorage.removeItem("saheli_current_user");
+    localStorage.removeItem("saheli_token");
+    orchestrator.loadUserState(null);
     setIsOnboarded(false);
+  };
+
+  const getInitials = (name: string) => {
+    if (!name) return "PD";
+    return name
+      .split(" ")
+      .filter(Boolean)
+      .map(p => p[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "PD";
   };
 
   const getNotificationLabel = (event: OrchestratorEvent) => {
@@ -156,7 +180,7 @@ export default function App() {
                 key={item.name}
                 onClick={() => setActiveTab(item.name)}
                 whileHover={{ scale: 1.02, x: 4 }}
-                whileTap={{ scale: 0.98 }}                
+                whileTap={{ scale: 0.98 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-display font-semibold rounded-xl transition-all cursor-pointer ${
                   isActive 
                     ? "bg-pastel-blue text-text-dark shadow-xs border border-blue-200/50" 
@@ -279,7 +303,7 @@ export default function App() {
                 <span className="text-[8px] text-pink-600 font-bold leading-tight mt-0.5 whitespace-nowrap">आपकी और आपके अपनों की</span>
               </div>
             </div>
-
+ 
             {/* Top Bar Search indicator */}
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/80 rounded-lg border border-gray-100 text-xs text-text-muted w-64">
               <Search className="w-3.5 h-3.5" />
@@ -349,11 +373,11 @@ export default function App() {
             {/* Profile vitals badge */}
             <div className="flex items-center gap-2 border-l border-gray-200 pl-4">
               <div className="w-8 h-8 rounded-full bg-pastel-purple flex items-center justify-center font-display font-bold text-xs text-text-dark border border-purple-200 shadow-sm">
-                PD
+                {getInitials(userProfile.name)}
               </div>
               <div className="hidden md:block text-left">
-                <span className="text-xs font-display font-bold text-text-dark block leading-none">Priya Devi</span>
-                <span className="text-[10px] text-text-muted block mt-0.5">28 yrs | O+ Group</span>
+                <span className="text-xs font-display font-bold text-text-dark block leading-none">{userProfile.name}</span>
+                <span className="text-[10px] text-text-muted block mt-0.5">{userProfile.age} yrs | {userProfile.bloodGroup || "O+"} Group</span>
               </div>
             </div>
 

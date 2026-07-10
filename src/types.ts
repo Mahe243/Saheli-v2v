@@ -361,4 +361,98 @@ export interface SearchIndex {
   metadata?: any;
 }
 
+// ==========================================
+// PHASE 5: SECURE MULTI-USER SYSTEM TYPES
+// ==========================================
+
+export type UserRole = "Patient" | "Doctor" | "Health Worker" | "Administrator";
+
+export interface User {
+  id: string;
+  email: string;
+  fullName: string;
+  phone?: string;
+  preferredLanguage: string;
+  role: UserRole;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserAuthentication {
+  id: string;
+  userId: string;
+  passwordHash: string; // Securely hashed
+  mfaEnabled: boolean;
+  googleId?: string;
+  otpCode?: string;
+  otpExpiry?: string;
+}
+
+export interface UserProfile {
+  id: string;
+  userId: string;
+  photoUrl?: string;
+  birthDate?: string;
+  age?: number;
+  height?: string;
+  weight?: string;
+  bloodGroup?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  updatedAt: string;
+}
+
+export interface UserSession {
+  id: string;
+  userId: string;
+  token: string;
+  expiresAt: string;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: string;
+}
+
+export interface UserPreferences {
+  userId: string;
+  theme: "light" | "dark" | "system";
+  notifications: {
+    email: boolean;
+    sms: boolean;
+    push: boolean;
+  };
+  privacy: {
+    shareWithDoctors: boolean;
+    shareWithCaregivers: boolean;
+    useAiOptimization: boolean;
+    allowAnonymousTelemetry: boolean;
+  };
+  reminders: {
+    medications: boolean;
+    appointments: boolean;
+    dailyCheckins: boolean;
+  };
+}
+
+export interface UserConsent {
+  id: string;
+  userId: string;
+  consentType: "Privacy Policy" | "Terms & Conditions" | "Doctor Sharing" | "AI Diagnostics Consent";
+  status: "Accepted" | "Revoked";
+  version: string;
+  ipAddress?: string;
+  timestamp: string;
+}
+
+export interface SecurityLog {
+  id: string;
+  userId?: string; // Optional if failed login attempts
+  action: "Login Success" | "Login Failed" | "Register" | "Logout" | "Password Reset Request" | "Password Changed" | "Data Exported" | "Account Deleted" | "Consent Accepted" | "Consent Revoked";
+  details: string;
+  ipAddress: string;
+  userAgent: string;
+  timestamp: string;
+}
+
+
+
 

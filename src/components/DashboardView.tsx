@@ -29,6 +29,7 @@ import LifeStageView from "./LifeStageView";
 import WeeklyCheckInView from "./WeeklyCheckInView";
 import HealthJournalView from "./HealthJournalView";
 import HealthGoalsView from "./HealthGoalsView";
+import SisterhoodView from "./SisterhoodView";
 
 interface DashboardViewProps {
   onNavigate: (tab: string) => void;
@@ -42,7 +43,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
   const [appointments, setAppointments] = useState<Appointment[]>(orchestrator.getAppointments());
 
   // Phase 3 active companion sub-tab state
-  const [activeCompanionTab, setActiveCompanionTab] = useState<"care" | "emotion" | "lifestage" | "checkin" | "journal" | "goals">("care");
+  const [activeCompanionTab, setActiveCompanionTab] = useState<"care" | "emotion" | "lifestage" | "checkin" | "journal" | "goals" | "sisterhood">("sisterhood");
 
   useEffect(() => {
     // Listen to changes in the orchestrator event bus
@@ -126,6 +127,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
           {/* Phase 3 Health Companion Tabs */}
           <div className="flex items-center gap-2 overflow-x-auto pb-3 scrollbar-none">
             {[
+              { id: "sisterhood" as const, label: "Sisterhood & Wisdom", icon: "👭" },
               { id: "care" as const, label: "Care Suite", icon: "🌸" },
               { id: "emotion" as const, label: "Emotional Health", icon: "🧘‍♀️" },
               { id: "lifestage" as const, label: "Life Stage", icon: "⏳" },
@@ -225,7 +227,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                     onClick={() => onNavigate("Care Journey Timeline")}
                     whileHover={{ scale: 1.02, y: -4 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#A7D8F2]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-[#A7D8F2]/30 to-[#A7D8F2]/10 text-indigo-600 border border-[#A7D8F2]/50">
@@ -245,7 +247,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                     onClick={() => onNavigate("Medical Records")}
                     whileHover={{ scale: 1.02, y: -4 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-indigo-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-indigo-50 to-indigo-100/50 text-indigo-600 border border-indigo-100">
@@ -265,7 +267,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                     onClick={() => onNavigate("Lab Intelligence")}
                     whileHover={{ scale: 1.02, y: -4 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-blue-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-blue-50 to-blue-100/50 text-blue-600 border border-blue-100">
@@ -285,7 +287,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                     onClick={() => onNavigate("Doctor Companion")}
                     whileHover={{ scale: 1.02, y: -4 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-pink-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-pink-50 to-pink-100/50 text-pink-600 border border-pink-100">
@@ -305,7 +307,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
                     onClick={() => onNavigate("Medication Dashboard")}
                     whileHover={{ scale: 1.02, y: -4 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#D8C4F1]/60 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
+                    className="flex items-center justify-between p-5 bg-white border border-gray-100 rounded-[22px] shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:border-[#E05B7C]/40 hover:shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-300 text-left group cursor-pointer"
                   >
                     <div className="flex items-center gap-4">
                       <div className="p-3.5 rounded-2xl bg-gradient-to-tr from-pink-50 to-[#E05B7C]/10 text-[#E05B7C] border border-[#E05B7C]/20">
@@ -347,6 +349,7 @@ export default function DashboardView({ onNavigate, onOpenSymptomModal }: Dashbo
             {activeCompanionTab === "checkin" && <WeeklyCheckInView />}
             {activeCompanionTab === "journal" && <HealthJournalView />}
             {activeCompanionTab === "goals" && <HealthGoalsView />}
+            {activeCompanionTab === "sisterhood" && <SisterhoodView />}
           </div>
         </div>
 

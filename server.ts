@@ -9,6 +9,7 @@ import fs from "fs";
 import dotenv from "dotenv";
 import { GoogleGenAI, Type } from "@google/genai";
 import { createServer as createViteServer } from "vite";
+import crypto from "crypto";
 
 dotenv.config();
 
@@ -16,6 +17,83 @@ const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+
+// Initialize database file path
+const DB_FILE = path.join(process.cwd(), "data", "saheli_db.json");
+
+interface DbSchema {
+  users: any[];
+  authentications: any[];
+  profiles: any[];
+  preferences: any[];
+  consents: any[];
+  securityLogs: any[];
+}
+
+function initDb() {
+  const dir = path.join(process.cwd(), "data");
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  if (!fs.existsSync(DB_FILE)) {
+    fs.writeFileSync(DB_FILE, JSON.stringify({
+      users: [],
+      authentications: [],
+      profiles: [],
+      preferences: [],
+      consents: [],
+      securityLogs: []
+    }, null, 2));
+  }
+}
+
+function readDb(): DbSchema {
+  initDb();
+  try {
+    const raw = fs.readFileSync(DB_FILE, "utf-8");
+    const data = JSON.parse(raw);
+    return {
+      users: data.users || [],
+      authentications: data.authentications || [],
+      profiles: data.profiles || [],
+      preferences: data.preferences || [],
+      consents: data.consents || [],
+      securityLogs: data.securityLogs || []
+    };
+  } catch (e) {
+    console.error("Error reading database file:", e);
+    return { users: [], authentications: [], profiles: [], preferences: [], consents: [], securityLogs: [] };
+  }
+}
+
+function writeDb(data: DbSchema) {
+  initDb();
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), "utf-8");
+  } catch (e) {
+    console.error("Error writing database file:", e);
+  }
+}
+
+function hashPassword(password: string, salt: string): string {
+  return crypto.createHash("sha256").update(password + salt).digest("hex");
+}
+
+function logSecurityAction(userId: string | undefined, action: string, details: string, req: express.Request) {
+  const db = readDb();
+  const log = {
+    id: "log_" + Math.random().toString(36).substring(2, 9),
+    userId,
+    action,
+    details,
+    ipAddress: req.ip || "127.0.0.1",
+    userAgent: req.headers["user-agent"] || "unknown",
+    timestamp: new Date().toISOString()
+  };
+  db.securityLogs.unshift(log);
+  writeDb(db);
+  console.log(`[Security Log] ${action}: ${details}`);
+}
 
 // Initialize Gemini client (safely, checking if API key is present)
 let ai: GoogleGenAI | null = null;
@@ -57,6 +135,313 @@ function safeParseJSON(text: string | undefined): any {
     }
   }
 }
+
+// Multi-User Auth Routes
+app.post("/api/auth/register", (req, res) => {
+  const { fullName, email, phone, password, preferredLanguage } = req.body;
+  if (!fullName || !email || !password) {
+    return res.status(400).json({ error: "Name, email and password are required fields." });
+  }
+
+  const db = readDb();
+  const normalizedEmail = email.toLowerCase().trim();
+
+  const existingUser = db.users.find(u => u.email.toLowerCase().trim() === normalizedEmail);
+  if (existingUser) {
+    return res.status(400).json({ error: "An account with this email address already exists." });
+  }
+
+  const userId = "u_" + Math.random().toString(36).substring(2, 9);
+  const salt = crypto.randomBytes(16).toString("hex");
+  const passwordHash = hashPassword(password, salt);
+
+  const newUser = {
+    id: userId,
+    email: normalizedEmail,
+    fullName,
+    phone,
+    preferredLanguage: preferredLanguage || "English",
+    role: "Patient", // Default Role
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  const newAuth = {
+    id: "auth_" + Math.random().toString(36).substring(2, 9),
+    userId,
+    passwordHash,
+    salt,
+    mfaEnabled: false
+  };
+
+  const newProfile = {
+    id: "prof_" + Math.random().toString(36).substring(2, 9),
+    userId,
+    age: 28, // Seed defaults which are overwritten by first-time onboarding
+    height: "155 cm",
+    weight: "58 kg",
+    bloodGroup: "O+",
+    emergencyContactName: "Rajesh Devi",
+    emergencyContactPhone: "+91 98765 43210",
+    updatedAt: new Date().toISOString()
+  };
+
+  const newPref = {
+    userId,
+    theme: "light",
+    notifications: { email: true, sms: false, push: true },
+    privacy: { shareWithDoctors: true, shareWithCaregivers: false, useAiOptimization: true, allowAnonymousTelemetry: false },
+    reminders: { medications: true, appointments: true, dailyCheckins: true }
+  };
+
+  const privacyConsent = {
+    id: "con_" + Math.random().toString(36).substring(2, 9),
+    userId,
+    consentType: "Privacy Policy",
+    status: "Accepted",
+    version: "1.0",
+    timestamp: new Date().toISOString()
+  };
+
+  const termsConsent = {
+    id: "con_" + Math.random().toString(36).substring(2, 9),
+    userId,
+    consentType: "Terms & Conditions",
+    status: "Accepted",
+    version: "1.0",
+    timestamp: new Date().toISOString()
+  };
+
+  db.users.push(newUser);
+  db.authentications.push(newAuth);
+  db.profiles.push(newProfile);
+  db.preferences.push(newPref);
+  db.consents.push(privacyConsent);
+  db.consents.push(termsConsent);
+
+  writeDb(db);
+
+  logSecurityAction(userId, "Register", `Successfully registered user account with email: ${normalizedEmail}`, req);
+  logSecurityAction(userId, "Consent Accepted", "Accepted Privacy Policy v1.0 and Terms & Conditions v1.0", req);
+
+  // Generate simple session token
+  const token = "sess_" + crypto.randomBytes(24).toString("hex");
+
+  return res.json({
+    success: true,
+    token,
+    user: newUser,
+    profile: newProfile,
+    preferences: newPref
+  });
+});
+
+app.post("/api/auth/login", (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: "Email and password are required fields." });
+  }
+
+  const db = readDb();
+  const normalizedEmail = email.toLowerCase().trim();
+
+  const user = db.users.find(u => u.email.toLowerCase().trim() === normalizedEmail);
+  if (!user) {
+    logSecurityAction(undefined, "Login Failed", `Attempted login for non-existent email: ${normalizedEmail}`, req);
+    return res.status(401).json({ error: "Invalid email or password." });
+  }
+
+  const auth = db.authentications.find(a => a.userId === user.id);
+  if (!auth) {
+    return res.status(500).json({ error: "Internal credentials lookup failed." });
+  }
+
+  const inputHash = hashPassword(password, auth.salt);
+  if (inputHash !== auth.passwordHash) {
+    logSecurityAction(user.id, "Login Failed", "Incorrect password entered", req);
+    return res.status(401).json({ error: "Invalid email or password." });
+  }
+
+  const profile = db.profiles.find(p => p.userId === user.id) || {};
+  const preferences = db.preferences.find(p => p.userId === user.id) || {};
+
+  logSecurityAction(user.id, "Login Success", `User ${normalizedEmail} authenticated successfully`, req);
+
+  const token = "sess_" + crypto.randomBytes(24).toString("hex");
+
+  return res.json({
+    success: true,
+    token,
+    user,
+    profile,
+    preferences
+  });
+});
+
+app.post("/api/auth/profile/update", (req, res) => {
+  const { userId, fullName, phone, preferredLanguage, age, height, weight, bloodGroup, emergencyContactName, emergencyContactPhone } = req.body;
+  if (!userId) {
+    return res.status(400).json({ error: "userId is required." });
+  }
+
+  const db = readDb();
+  const userIndex = db.users.findIndex(u => u.id === userId);
+  if (userIndex === -1) {
+    return res.status(404).json({ error: "User not found." });
+  }
+
+  // Update User attributes
+  db.users[userIndex].fullName = fullName || db.users[userIndex].fullName;
+  db.users[userIndex].phone = phone || db.users[userIndex].phone;
+  db.users[userIndex].preferredLanguage = preferredLanguage || db.users[userIndex].preferredLanguage;
+  db.users[userIndex].updatedAt = new Date().toISOString();
+
+  // Update or Create Profile
+  let profIndex = db.profiles.findIndex(p => p.userId === userId);
+  if (profIndex === -1) {
+    const newProf = {
+      id: "prof_" + Math.random().toString(36).substring(2, 9),
+      userId,
+      age: Number(age) || 28,
+      height: height || "155 cm",
+      weight: weight || "58 kg",
+      bloodGroup: bloodGroup || "O+",
+      emergencyContactName: emergencyContactName || "",
+      emergencyContactPhone: emergencyContactPhone || "",
+      updatedAt: new Date().toISOString()
+    };
+    db.profiles.push(newProf);
+    profIndex = db.profiles.length - 1;
+  } else {
+    db.profiles[profIndex].age = Number(age) !== undefined ? Number(age) : db.profiles[profIndex].age;
+    db.profiles[profIndex].height = height !== undefined ? height : db.profiles[profIndex].height;
+    db.profiles[profIndex].weight = weight !== undefined ? weight : db.profiles[profIndex].weight;
+    db.profiles[profIndex].bloodGroup = bloodGroup !== undefined ? bloodGroup : db.profiles[profIndex].bloodGroup;
+    db.profiles[profIndex].emergencyContactName = emergencyContactName !== undefined ? emergencyContactName : db.profiles[profIndex].emergencyContactName;
+    db.profiles[profIndex].emergencyContactPhone = emergencyContactPhone !== undefined ? emergencyContactPhone : db.profiles[profIndex].emergencyContactPhone;
+    db.profiles[profIndex].updatedAt = new Date().toISOString();
+  }
+
+  writeDb(db);
+  logSecurityAction(userId, "Password Changed", "Profile details updated", req);
+
+  return res.json({
+    success: true,
+    user: db.users[userIndex],
+    profile: db.profiles[profIndex]
+  });
+});
+
+app.post("/api/auth/preferences/update", (req, res) => {
+  const { userId, theme, notifications, privacy, reminders } = req.body;
+  if (!userId) {
+    return res.status(400).json({ error: "userId is required." });
+  }
+
+  const db = readDb();
+  let prefIndex = db.preferences.findIndex(p => p.userId === userId);
+
+  if (prefIndex === -1) {
+    const newPref = {
+      userId,
+      theme: theme || "light",
+      notifications: notifications || { email: true, sms: false, push: true },
+      privacy: privacy || { shareWithDoctors: true, shareWithCaregivers: false, useAiOptimization: true, allowAnonymousTelemetry: false },
+      reminders: reminders || { medications: true, appointments: true, dailyCheckins: true }
+    };
+    db.preferences.push(newPref);
+    prefIndex = db.preferences.length - 1;
+  } else {
+    db.preferences[prefIndex].theme = theme || db.preferences[prefIndex].theme;
+    db.preferences[prefIndex].notifications = { ...db.preferences[prefIndex].notifications, ...notifications };
+    db.preferences[prefIndex].privacy = { ...db.preferences[prefIndex].privacy, ...privacy };
+    db.preferences[prefIndex].reminders = { ...db.preferences[prefIndex].reminders, ...reminders };
+  }
+
+  writeDb(db);
+  logSecurityAction(userId, "Consent Accepted", "Updated user system, notification, and privacy preferences", req);
+
+  return res.json({
+    success: true,
+    preferences: db.preferences[prefIndex]
+  });
+});
+
+app.post("/api/auth/consent/update", (req, res) => {
+  const { userId, consentType, status } = req.body;
+  if (!userId || !consentType || !status) {
+    return res.status(400).json({ error: "Missing required consent parameters." });
+  }
+
+  const db = readDb();
+  const consent = {
+    id: "con_" + Math.random().toString(36).substring(2, 9),
+    userId,
+    consentType,
+    status,
+    version: "1.0",
+    timestamp: new Date().toISOString()
+  };
+
+  db.consents.push(consent);
+  writeDb(db);
+
+  logSecurityAction(userId, status === "Accepted" ? "Consent Accepted" : "Consent Revoked", `${status} consent for: ${consentType}`, req);
+
+  return res.json({ success: true, consent });
+});
+
+app.get("/api/auth/logs/:userId", (req, res) => {
+  const { userId } = req.params;
+  const db = readDb();
+  const userLogs = db.securityLogs.filter(l => l.userId === userId);
+  return res.json({ logs: userLogs });
+});
+
+app.get("/api/auth/export/:userId", (req, res) => {
+  const { userId } = req.params;
+  const db = readDb();
+
+  const user = db.users.find(u => u.id === userId);
+  if (!user) {
+    return res.status(404).json({ error: "User not found." });
+  }
+
+  const profile = db.profiles.find(p => p.userId === userId) || {};
+  const preferences = db.preferences.find(p => p.userId === userId) || {};
+  const consents = db.consents.filter(c => c.userId === userId);
+  const logs = db.securityLogs.filter(l => l.userId === userId);
+
+  return res.json({
+    exportedAt: new Date().toISOString(),
+    user,
+    profile,
+    preferences,
+    consents,
+    logs
+  });
+});
+
+app.post("/api/auth/delete", (req, res) => {
+  const { userId } = req.body;
+  if (!userId) {
+    return res.status(400).json({ error: "userId is required." });
+  }
+
+  const db = readDb();
+  
+  db.users = db.users.filter(u => u.id !== userId);
+  db.authentications = db.authentications.filter(a => a.userId !== userId);
+  db.profiles = db.profiles.filter(p => p.userId !== userId);
+  db.preferences = db.preferences.filter(p => p.userId !== userId);
+  db.consents = db.consents.filter(c => c.userId !== userId);
+  db.securityLogs = db.securityLogs.filter(l => l.userId !== userId);
+
+  writeDb(db);
+  console.log(`[Account Deletion] User ${userId} and all related data purged completely.`);
+
+  return res.json({ success: true, message: "Account and associated health profiles completely deleted." });
+});
 
 // Serve saheli image dynamically from the workspace root, assets, or src directory
 app.get("/saheli.jpeg", (req, res) => {
