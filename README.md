@@ -100,26 +100,23 @@ Our vision is to make healthcare more accessible, organized, and personalized wh
 
 # 🏗️ System Architecture
 
-- Saheli leverages a modern serverless, offline-first approach built on Google Cloud Platform to maintain strict privacy standards and fluid user performance.
+```mermaid
+flowchart TD
+    U[👩 User]
+    LB[Google Cloud Load Balancer]
+    CR[Cloud Run<br/>Next.js App]
+    SQL[(Cloud SQL<br/>PostgreSQL)]
+    AI[Gemini AI<br/>Google AI Studio]
+    CS[Cloud Storage]
+    LS[Browser Local Storage<br/>Offline Cache]
 
-                              [ User / Client Browser ]
-                                          │
-                                   (HTTPS Traffic)
-                                          ▼
-                         [ Google Cloud Load Balancer ]
-                                          │
-                                          ▼
-                       [ Google Cloud Run (Next.js Node App) ]
-                              │           │            │
-     ┌────────────────────────┘           │            └────────────────────────┐
-     ▼                                    ▼                                     ▼
-[ Cloud SQL (PostgreSQL) ]           [ Google AI Studio ]                  [ Cloud Storage ]
-(Users, Profiles, Audit Logs)         (Gemini API / Orchestrator)           (Encrypted Exports, PDFs)
-│
-▼
-[ LocalStorage (Browser Cache) ]
-(Offline fallback, Vitals Cache)
-
+    U -->|HTTPS| LB
+    LB --> CR
+    CR --> SQL
+    CR --> AI
+    CR --> CS
+    CR --> LS
+```
 ---
 
 # 🤖 AI Tools Used
