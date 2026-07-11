@@ -103,19 +103,15 @@ Our vision is to make healthcare more accessible, organized, and personalized wh
 ```mermaid
 flowchart TD
     U[👩 User]
-    LB[Google Cloud Load Balancer]
-    CR[Cloud Run<br/>Next.js App]
-    SQL[(Cloud SQL<br/>PostgreSQL)]
-    AI[Gemini AI<br/>Google AI Studio]
+    R[React Application]
+    AI[Google AI Studio<br/>Gemini API]
+    LS[Browser Local Storage]
     CS[Cloud Storage]
-    LS[Browser Local Storage<br/>Offline Cache]
 
-    U -->|HTTPS| LB
-    LB --> CR
-    CR --> SQL
-    CR --> AI
-    CR --> CS
-    CR --> LS
+    U -->|HTTPS| R
+    R -->|AI Requests| AI
+    R -->|Cache & Offline Data| LS
+    R -->|Reports & Exports| CS
 ```
 ---
 
